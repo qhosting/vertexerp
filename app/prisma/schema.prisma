@@ -1,0 +1,472 @@
+generator client {
+    provider = "prisma-client-js"
+    binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x"]
+    output = "/home/ubuntu/sistema_erp_completo/app/node_modules/.prisma/client"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+// ============= AUTENTICACIÓN Y USUARIOS =============
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  firstName     String?
+  lastName      String?
+  email         String    @unique
+  password      String?
+  emailVerified DateTime?
+  image         String?
+  phone         String?
+  role          UserRole  @default(CLIENTE)
+  isActive      Boolean   @default(true)
+  sucursal      String?
+  lastLogin     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts Account[]
+  sessions Session[]
+  
+  // Relaciones con módulos
+  ventasCreadas Venta[] @relation("VentaCreador")
+  pagosGestionados Pago[] @relation("PagoGestor")
+  clientesAsignados Cliente[] @relation("ClienteGestor")
+  auditLogs AuditLog[]
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+enum UserRole {
+  SUPERADMIN
+  ADMIN
+  ANALISTA
+  GESTOR
+  CLIENTE
+  VENTAS
+}
+
+// ============= CONFIGURACIÓN MARCA BLANCA =============
+
+model Configuracion {
+  id            String   @id @default(cuid())
+  nombreEmpresa String   @default("Sistema ERP")
+  logoUrl       String?
+  colorPrimario String   @default("#3B82F6")
+  colorSecundario String @default("#10B981")
+  direccion     String?
+  telefono      String?
+  email         String?
+  rfc           String?
+  configJson    Json?    // Configuraciones adicionales
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// ============= CATÁLOGOS BASE =============
+
+model Cliente {
+  id                String    @id @default(cuid())
+  codigoCliente     String    @unique // cod_cliente
+  contrato          String?   // contrato_cliente
+  nombre            String    // nombre_ccliente
+  
+  // Información de contacto
+  telefono1         String?   // tel1_cliente
+  telefono2         String?   // tel2_cliente  
+  telefono3         String?   // tel3_cliente
+  email             String?
+  
+  // Dirección
+  calle             String?   // calle_dom
+  numeroExterior    String?   // exterior_dom
+  numeroInterior    String?   // interior_dom
+  colonia           String?   // colonia_dom
+  municipio         String?   // municipio_dom
+  estado            String?   // estado_dom
+  codigoPostal      String?   // cp_dom
+  latitud           String?   // lat_dom
+  longitud          String?   // long_dom
+  
+  // Información financiera
+  saldoActual       Float     @default(0) // saldo_actualcli
+  pagosPeriodicos   Float     @default(0) // pagos_cliente
+  periodicidad      Periodicidad @default(SEMANAL) // periodicidad_cliente
+  diaCobro          String?   // dia_cobro
+  diaPago           String?   // dia_pago
+  statusCuenta      String?   // statuscuenta
+  limiteCredito     Float     @default(0)
+  
+  // Información laboral y referencias
+  empleo            String?   // empleo
+  aval              String?   // aval
+  
+  // Control interno
+  status            StatusCliente @default(ACTIVO) // status_cliente
+  gestorId          String?   // FK a User con rol GESTOR
+  vendedorId        String?   // FK a User con rol VENTAS
+  
+  // Fechas
+  fechaAlta         DateTime  @default(now()) // fecha_alta
+  ultimaActualizacion DateTime @default(now()) @updatedAt // fechau_cliente
+  
+  // Relaciones
+  gestor            User?     @relation("ClienteGestor", fields: [gestorId], references: [id])
+  ventas            Venta[]
+  pagos             Pago[]
+  creditoHistorial  CreditoHistorial[]
+  
+  @@map("clientes")
+}
+
+model Producto {
+  id            String   @id @default(cuid())
+  codigo        String   @unique
+  nombre        String
+  descripcion   String?
+  categoria     String?
+  marca         String?
+  modelo        String?
+  
+  // Precios y costos
+  precioVenta   Float
+  precioCompra  Float?
+  margen        Float?
+  
+  // Inventario
+  stock         Int      @default(0)
+  stockMinimo   Int      @default(0)
+  unidadMedida  String   @default("PZA")
+  
+  // Control
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Relaciones
+  ventaItems    VentaItem[]
+  compraItems   CompraItem[]
+  movimientos   MovimientoInventario[]
+  
+  @@map("productos")
+}
+
+model Proveedor {
+  id            String   @id @default(cuid())
+  codigo        String   @unique
+  nombre        String
+  contacto      String?
+  telefono      String?
+  email         String?
+  direccion     String?
+  rfc           String?
+  diasCredito   Int      @default(0)
+  limiteCredito Float    @default(0)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Relaciones
+  compras       Compra[]
+  cuentasPorPagar CuentaPorPagar[]
+  
+  @@map("proveedores")
+}
+
+// ============= MÓDULO DE VENTAS =============
+
+model Venta {
+  id                String      @id @default(cuid())
+  numeroVenta       String      @unique
+  clienteId         String
+  vendedorId        String
+  
+  // Datos financieros
+  subtotal          Float
+  iva               Float       @default(0)
+  descuento         Float       @default(0)
+  total             Float
+  
+  // Control de pagos
+  anticipo          Float       @default(0)
+  saldo             Float
+  periodicidadPago  Periodicidad @default(SEMANAL)
+  numeroPagos       Int
+  montoPago         Float
+  
+  // Status y fechas
+  status            StatusVenta @default(PENDIENTE)
+  fechaVenta        DateTime    @default(now())
+  fechaVencimiento  DateTime?
+  
+  // Metadatos
+  observaciones     String?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  
+  // Relaciones
+  cliente           Cliente     @relation(fields: [clienteId], references: [id])
+  vendedor          User        @relation("VentaCreador", fields: [vendedorId], references: [id])
+  items             VentaItem[]
+  pagos             Pago[]
+  
+  @@map("ventas")
+}
+
+model VentaItem {
+  id          String   @id @default(cuid())
+  ventaId     String
+  productoId  String
+  cantidad    Int
+  precioUnitario Float
+  descuento   Float    @default(0)
+  subtotal    Float
+  
+  venta       Venta    @relation(fields: [ventaId], references: [id], onDelete: Cascade)
+  producto    Producto @relation(fields: [productoId], references: [id])
+  
+  @@map("venta_items")
+}
+
+// ============= MÓDULO DE PAGOS Y COBRANZA =============
+
+model Pago {
+  id                String       @id @default(cuid())
+  clienteId         String
+  ventaId           String?
+  gestorId          String?
+  
+  // Datos del pago
+  referencia        String       // ref_pago
+  monto             Float        // montop
+  tipoPago          TipoPago     @default(EFECTIVO) // tipopag
+  
+  // Fechas
+  fechaPago         DateTime     @default(now()) // fechap
+  fechaHora         DateTime     @default(now()) // fechahora
+  
+  // Geolocalización
+  latitud           String?      // latitud
+  longitud          String?      // longitud
+  sucursal          String?      // sucursal
+  
+  // Control
+  verificado        Boolean      @default(false) // verificado
+  sincronizado      Boolean      @default(false) // descargado
+  deviceImei        String?      // imei
+  
+  // Relaciones
+  cliente           Cliente      @relation(fields: [clienteId], references: [id])
+  venta             Venta?       @relation(fields: [ventaId], references: [id])
+  gestor            User?        @relation("PagoGestor", fields: [gestorId], references: [id])
+  
+  @@map("pagos")
+}
+
+// ============= MÓDULO DE INVENTARIO Y ALMACÉN =============
+
+model Compra {
+  id            String       @id @default(cuid())
+  numeroCompra  String       @unique
+  proveedorId   String
+  
+  // Datos financieros
+  subtotal      Float
+  iva           Float        @default(0)
+  total         Float
+  
+  // Status y fechas
+  status        StatusCompra @default(PENDIENTE)
+  fechaCompra   DateTime     @default(now())
+  fechaRecepcion DateTime?
+  
+  // Metadatos
+  observaciones String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  
+  // Relaciones
+  proveedor     Proveedor    @relation(fields: [proveedorId], references: [id])
+  items         CompraItem[]
+  cuentasPorPagar CuentaPorPagar[]
+  
+  @@map("compras")
+}
+
+model CompraItem {
+  id          String   @id @default(cuid())
+  compraId    String
+  productoId  String
+  cantidad    Int
+  precioUnitario Float
+  subtotal    Float
+  
+  compra      Compra   @relation(fields: [compraId], references: [id], onDelete: Cascade)
+  producto    Producto @relation(fields: [productoId], references: [id])
+  
+  @@map("compra_items")
+}
+
+model MovimientoInventario {
+  id          String            @id @default(cuid())
+  productoId  String
+  tipo        TipoMovimiento
+  cantidad    Int
+  cantidadAnterior Int
+  cantidadNueva    Int
+  motivo      String
+  referencia  String?
+  fechaMovimiento DateTime       @default(now())
+  userId      String?
+  
+  producto    Producto         @relation(fields: [productoId], references: [id])
+  
+  @@map("movimientos_inventario")
+}
+
+// ============= MÓDULO DE CUENTAS POR PAGAR =============
+
+model CuentaPorPagar {
+  id            String   @id @default(cuid())
+  proveedorId   String
+  compraId      String?
+  numeroFactura String
+  monto         Float
+  montoRestante Float
+  fechaVencimiento DateTime
+  status        StatusCuentaPago @default(PENDIENTE)
+  observaciones String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  proveedor     Proveedor @relation(fields: [proveedorId], references: [id])
+  compra        Compra?   @relation(fields: [compraId], references: [id])
+  
+  @@map("cuentas_por_pagar")
+}
+
+// ============= MÓDULO DE GESTIÓN DE CRÉDITO =============
+
+model CreditoHistorial {
+  id            String   @id @default(cuid())
+  clienteId     String
+  evento        String   // Tipo de evento crediticio
+  montoAnterior Float
+  montoNuevo    Float
+  observaciones String?
+  fechaEvento   DateTime @default(now())
+  
+  cliente       Cliente  @relation(fields: [clienteId], references: [id])
+  
+  @@map("credito_historial")
+}
+
+// ============= AUDITORÍA Y LOGS =============
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  accion    String   // CREATE, UPDATE, DELETE
+  tabla     String   // Nombre de la tabla afectada
+  registroId String  // ID del registro afectado
+  datosAnteriores Json?
+  datosNuevos     Json?
+  ip        String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  
+  user      User?    @relation(fields: [userId], references: [id])
+  
+  @@map("audit_logs")
+}
+
+// ============= ENUMS =============
+
+enum Periodicidad {
+  DIARIA
+  SEMANAL
+  QUINCENAL
+  MENSUAL
+  BIMENSUAL
+}
+
+enum StatusCliente {
+  ACTIVO
+  INACTIVO
+  MOROSO
+  BLOQUEADO
+  PROSPECTO
+}
+
+enum StatusVenta {
+  PENDIENTE
+  CONFIRMADA
+  ENTREGADA
+  CANCELADA
+  PAGADA
+}
+
+enum StatusCompra {
+  PENDIENTE
+  CONFIRMADA
+  RECIBIDA
+  CANCELADA
+}
+
+enum StatusCuentaPago {
+  PENDIENTE
+  PARCIAL
+  PAGADA
+  VENCIDA
+}
+
+enum TipoPago {
+  EFECTIVO
+  TARJETA
+  TRANSFERENCIA
+  CHEQUE
+  OTRO
+}
+
+enum TipoMovimiento {
+  ENTRADA
+  SALIDA
+  AJUSTE
+  TRANSFERENCIA
+}
