@@ -68,7 +68,7 @@ const navItems: NavItem[] = [
   },
   {
     title: 'Cobranza Móvil',
-    href: '/cobranza-movil',
+    href: '/dashboard/cobranza-movil',
     icon: Smartphone,
     permission: 'cobranza',
   },

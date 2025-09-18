@@ -1,15 +1,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
+import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
-
-// Simulación de conexión a base de datos MySQL
-const dbConfig = {
-  host: 'localhost',
-  user: 'mueblesdaso_cob',
-  password: 'B4Dl6VlHDo',
-  database: 'mueblesdaso_cob'
-};
+import { prisma } from '@/lib/prisma';
 
 export async function GET(request: NextRequest) {
   try {
@@ -23,82 +16,89 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const codigoGestor = searchParams.get('codigo_gestor');
-    
-    if (!codigoGestor) {
-      return NextResponse.json(
-        { error: 'Código de gestor requerido' },
-        { status: 400 }
-      );
+    const gestorId = searchParams.get('gestorId');
+    const limit = parseInt(searchParams.get('limit') || '100');
+    const sync = searchParams.get('sync') === 'true';
+
+    let whereClause: any = {
+      status: { not: 'BLOQUEADO' }
+    };
+
+    // Filtrar por gestor si se proporciona y el usuario no es ADMIN o SUPERADMIN
+    if (gestorId && !['ADMIN', 'SUPERADMIN'].includes(session.user.role)) {
+      whereClause.gestorId = gestorId;
     }
 
-    // Aquí iría la consulta real a MySQL
-    // const mysql = require('mysql2/promise');
-    // const connection = await mysql.createConnection(dbConfig);
-    // const query = `
-    //   SELECT 
-    //     cod_cliente, nombre_ccliente, codigo_gestor, periodicidad_cliente,
-    //     pagos_cliente, calle_dom, exterior_dom, interior_dom, colonia_dom,
-    //     municipio_dom, tel1_cliente, saldo_actualcli, dia_cobro,
-    //     semv, semdv, lat_dom, long_dom
-    //   FROM cat_clientes 
-    //   WHERE codigo_gestor = ? AND pagar = 0
-    //   ORDER BY nombre_ccliente
-    // `;
-    // const [rows] = await connection.execute(query, [codigoGestor]);
-    // await connection.end();
-
-    // Por ahora devolvemos datos de ejemplo basados en el SQL proporcionado
-    // Convertimos el formato para que coincida con la interfaz Cliente del frontend
-    const clientesEjemplo = [
-      {
-        id: 'cli-001',
-        codigoCliente: 'DQ2207185',
-        nombre: 'FERNANDO RIVERA RAMIREZ',
-        telefono1: '4426056846',
-        municipio: 'Corregidora',
-        estado: 'Querétaro',
-        saldoActual: 5962,
-        pagosPeriodicos: 1071,
-        periodicidad: 'QUINCENAL',
-        status: 'ACTIVO',
-        diaCobro: 'SABADO',
-        gestor: { firstName: 'Bot', lastName: 'DQ' },
-        vendedor: { firstName: 'Ventas', lastName: 'Sistema' }
+    const clientes = await prisma.cliente.findMany({
+      where: whereClause,
+      include: {
+        gestor: {
+          select: {
+            id: true,
+            name: true,
+            firstName: true,
+            lastName: true,
+            email: true
+          }
+        }
       },
-      {
-        id: 'cli-002',
-        codigoCliente: 'DQ2209197',
-        nombre: 'VICTORIA RAMOS MONTOYA',
-        telefono1: '4425554623',
-        municipio: 'El Marqués',
-        estado: 'Querétaro',
-        saldoActual: 22381.01,
-        pagosPeriodicos: 1320,
-        periodicidad: 'MENSUAL',
-        status: 'ACTIVO',
-        diaCobro: 'SABADO',
-        gestor: { firstName: 'Bot', lastName: 'DQ' },
-        vendedor: { firstName: 'Ventas', lastName: 'Sistema' }
+      orderBy: {
+        nombre: 'asc'
       },
-      {
-        id: 'cli-003',
-        codigoCliente: 'DQ2301139',
-        nombre: 'LILIA BOTELLO LOPEZ',
-        telefono1: '7297521774',
-        municipio: 'San Juan del Río',
-        estado: 'Querétaro',
-        saldoActual: 1493.01,
-        pagosPeriodicos: 120,
-        periodicidad: 'SEMANAL',
-        status: 'ACTIVO',
-        diaCobro: 'VIERNES',
-        gestor: { firstName: 'Bot', lastName: 'DQ' },
-        vendedor: { firstName: 'Ventas', lastName: 'Sistema' }
-      }
-    ];
+      take: limit
+    });
 
-    return NextResponse.json(clientesEjemplo, { status: 200 });
+    // Formatear datos para compatibilidad con cobranza móvil
+    const formattedClientes = clientes.map(cliente => ({
+      id: cliente.id,
+      cod_cliente: cliente.codigoCliente,
+      codigoCliente: cliente.codigoCliente,
+      contrato_cliente: cliente.contrato,
+      nombre_ccliente: cliente.nombre,
+      nombre: cliente.nombre,
+      tel1_cliente: cliente.telefono1,
+      telefono1: cliente.telefono1,
+      tel2_cliente: cliente.telefono2,
+      telefono2: cliente.telefono2,
+      tel3_cliente: cliente.telefono3,
+      telefono3: cliente.telefono3,
+      email: cliente.email,
+      calle_dom: cliente.calle,
+      exterior_dom: cliente.numeroExterior,
+      interior_dom: cliente.numeroInterior,
+      colonia_dom: cliente.colonia,
+      municipio_dom: cliente.municipio,
+      estado_dom: cliente.estado,
+      cp_dom: cliente.codigoPostal,
+      direccion: `${cliente.calle || ''} ${cliente.numeroExterior || ''} ${cliente.colonia || ''} ${cliente.municipio || ''}`.trim(),
+      lat_dom: cliente.latitud,
+      long_dom: cliente.longitud,
+      saldo_actualcli: cliente.saldoActual,
+      saldoActual: cliente.saldoActual,
+      pagos_cliente: cliente.pagosPeriodicos,
+      pagosPeriodicos: cliente.pagosPeriodicos,
+      periodicidad_cliente: cliente.periodicidad,
+      periodicidad: cliente.periodicidad,
+      dia_cobro: cliente.diaCobro,
+      dia_pago: cliente.diaPago,
+      statuscuenta: cliente.statusCuenta,
+      status_cliente: cliente.status,
+      status: cliente.status,
+      codigo_gestor: cliente.gestorId,
+      gestorId: cliente.gestorId,
+      gestor: cliente.gestor,
+      fecha_alta: cliente.fechaAlta,
+      fechau_cliente: cliente.ultimaActualizacion,
+      empleo: cliente.empleo,
+      aval: cliente.aval,
+      limite_credito: cliente.limiteCredito,
+      
+      // Campos adicionales para la web
+      createdAt: cliente.fechaAlta,
+      updatedAt: cliente.ultimaActualizacion
+    }));
+
+    return NextResponse.json(formattedClientes, { status: 200 });
     
   } catch (error) {
     console.error('Error obteniendo clientes:', error);
