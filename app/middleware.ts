@@ -7,9 +7,10 @@ export default withAuth(
     const { token } = req.nextauth;
     const isAuthPage = req.nextUrl.pathname.startsWith('/auth') || 
                       req.nextUrl.pathname.startsWith('/api/auth');
+    const isTestPage = req.nextUrl.pathname.startsWith('/test-');
     
-    // If not authenticated and trying to access protected route
-    if (!token && !isAuthPage && req.nextUrl.pathname !== '/') {
+    // If not authenticated and trying to access protected route (but allow test pages)
+    if (!token && !isAuthPage && !isTestPage && req.nextUrl.pathname !== '/') {
       return NextResponse.redirect(new URL('/auth/signin', req.url));
     }
     
@@ -28,8 +29,10 @@ export default withAuth(
   {
     callbacks: {
       authorized: ({ token, req }) => {
-        // Allow access to auth pages
-        if (req.nextUrl.pathname.startsWith('/auth') || req.nextUrl.pathname.startsWith('/api/auth')) {
+        // Allow access to auth pages and test pages
+        if (req.nextUrl.pathname.startsWith('/auth') || 
+            req.nextUrl.pathname.startsWith('/api/auth') ||
+            req.nextUrl.pathname.startsWith('/test-')) {
           return true;
         }
         // Require token for all other pages
