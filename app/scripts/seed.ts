@@ -7,16 +7,33 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('Seeding database...');
 
-  // Create test admin user
-  const hashedPassword = await bcrypt.hash('johndoe123', 12);
+  // Create test admin user with the credentials specified
+  const hashedPassword = await bcrypt.hash('123456', 12);
   
   try {
+    await prisma.user.upsert({
+      where: { email: 'admin@sistema.com' },
+      update: {},
+      create: {
+        email: 'admin@sistema.com',
+        password: hashedPassword,
+        firstName: 'Admin',
+        lastName: 'Sistema',
+        name: 'Admin Sistema',
+        role: 'SUPERADMIN',
+        isActive: true,
+      },
+    });
+    console.log('Main admin user created/updated');
+
+    // Create additional admin users
+    const johnHashedPassword = await bcrypt.hash('johndoe123', 12);
     await prisma.user.upsert({
       where: { email: 'john@doe.com' },
       update: {},
       create: {
         email: 'john@doe.com',
-        password: hashedPassword,
+        password: johnHashedPassword,
         firstName: 'John',
         lastName: 'Doe',
         name: 'John Doe',
@@ -24,7 +41,7 @@ async function main() {
         isActive: true,
       },
     });
-    console.log('Test admin user created/updated');
+    console.log('John admin user created/updated');
 
     // Create sample admin user for the system
     const adminHashedPassword = await bcrypt.hash('admin123', 12);
@@ -35,13 +52,13 @@ async function main() {
         email: 'admin@empresa.com',
         password: adminHashedPassword,
         firstName: 'Admin',
-        lastName: 'Sistema',
-        name: 'Admin Sistema',
+        lastName: 'Empresa',
+        name: 'Admin Empresa',
         role: 'SUPERADMIN',
         isActive: true,
       },
     });
-    console.log('System admin user created/updated');
+    console.log('Company admin user created/updated');
 
     // Create additional test users with different patterns
     const patterns = [
