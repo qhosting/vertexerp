@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { LogOut, Settings, User, Bell } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'react-hot-toast';
 
 interface HeaderProps {
   title: string;
@@ -21,36 +21,22 @@ interface HeaderProps {
 
 export function Header({ title, description }: HeaderProps) {
   const { data: session } = useSession() || {};
-  const { toast } = useToast();
 
   const handleSignOut = async () => {
     try {
       await signOut({ callbackUrl: '/login' });
-      toast({
-        title: "Sesión cerrada",
-        description: "Has cerrado sesión correctamente",
-      });
+      toast.success('Sesión cerrada correctamente');
     } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "No se pudo cerrar la sesión",
-      });
+      toast.error('No se pudo cerrar la sesión');
     }
   };
 
   const handleProfile = () => {
-    toast({
-      title: "Mi Perfil",
-      description: "Función de perfil en desarrollo",
-    });
+    toast('Función de perfil en desarrollo', { icon: '👤' });
   };
 
   const handleSettings = () => {
-    toast({
-      title: "Configuración",
-      description: "Panel de configuración en desarrollo",
-    });
+    toast('Panel de configuración en desarrollo', { icon: '⚙️' });
   };
 
   const getUserInitials = () => {
@@ -97,10 +83,7 @@ export function Header({ title, description }: HeaderProps) {
             variant="ghost" 
             size="icon" 
             className="relative" 
-            onClick={() => toast({
-              title: "Notificaciones",
-              description: "Panel de notificaciones en desarrollo",
-            })}
+            onClick={() => toast('Panel de notificaciones en desarrollo', { icon: '🔔' })}
           >
             <Bell className="h-5 w-5" />
             <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
@@ -111,7 +94,14 @@ export function Header({ title, description }: HeaderProps) {
           {/* User menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="flex items-center space-x-2 px-3">
+              <Button 
+                variant="ghost" 
+                className="flex items-center space-x-2 px-3" 
+                onClick={(e) => e.preventDefault()}
+                role="button"
+                aria-expanded="false"
+                aria-haspopup="true"
+              >
                 <Avatar className="h-8 w-8">
                   <AvatarFallback className="bg-blue-500 text-white text-sm">
                     {getUserInitials()}
