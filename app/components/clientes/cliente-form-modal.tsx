@@ -73,8 +73,8 @@ const initialForm: ClienteForm = {
   status: 'ACTIVO',
   diaCobro: 'LUNES',
   observaciones: '',
-  gestorId: '',
-  vendedorId: ''
+  gestorId: 'sin-gestor',
+  vendedorId: 'sin-vendedor'
 };
 
 export function ClienteFormModal({ isOpen, onClose, clienteId, onSuccess }: ClienteFormModalProps) {
@@ -109,11 +109,15 @@ export function ClienteFormModal({ isOpen, onClose, clienteId, onSuccess }: Clie
       const response = await fetch('/api/users');
       if (response.ok) {
         const users = await response.json();
-        setGestores(users.filter((user: UserOption) => user.role === 'GESTOR' || user.role === 'ADMIN' || user.role === 'SUPERADMIN'));
-        setVendedores(users.filter((user: UserOption) => user.role === 'VENTAS' || user.role === 'ADMIN' || user.role === 'SUPERADMIN'));
+        setGestores(users?.filter?.((user: UserOption) => user.role === 'GESTOR' || user.role === 'ADMIN' || user.role === 'SUPERADMIN') || []);
+        setVendedores(users?.filter?.((user: UserOption) => user.role === 'VENTAS' || user.role === 'ADMIN' || user.role === 'SUPERADMIN') || []);
+      } else {
+        console.error('Error response:', response.status, response.statusText);
+        toast.error('Error al cargar usuarios');
       }
     } catch (error) {
       console.error('Error fetching users:', error);
+      toast.error('Error al cargar usuarios');
     } finally {
       setLoadingUsers(false);
     }
@@ -143,8 +147,8 @@ export function ClienteFormModal({ isOpen, onClose, clienteId, onSuccess }: Clie
           status: cliente.status || 'ACTIVO',
           diaCobro: cliente.diaCobro || 'LUNES',
           observaciones: cliente.observaciones || '',
-          gestorId: cliente.gestorId || '',
-          vendedorId: cliente.vendedorId || ''
+          gestorId: cliente.gestorId || 'sin-gestor',
+          vendedorId: cliente.vendedorId || 'sin-vendedor'
         });
       }
     } catch (error) {
@@ -171,8 +175,8 @@ export function ClienteFormModal({ isOpen, onClose, clienteId, onSuccess }: Clie
         body: JSON.stringify({
           ...form,
           pagosPeriodicos: parseFloat(form.pagosPeriodicos) || 0,
-          gestorId: form.gestorId || null,
-          vendedorId: form.vendedorId || null,
+          gestorId: (form.gestorId && form.gestorId !== 'sin-gestor') ? form.gestorId : null,
+          vendedorId: (form.vendedorId && form.vendedorId !== 'sin-vendedor') ? form.vendedorId : null,
         }),
       });
 
@@ -298,34 +302,34 @@ export function ClienteFormModal({ isOpen, onClose, clienteId, onSuccess }: Clie
 
                   <div className="space-y-2">
                     <Label htmlFor="gestorId">Gestor Asignado</Label>
-                    <Select value={form.gestorId} onValueChange={(value) => handleChange('gestorId', value)}>
+                    <Select value={form.gestorId || "sin-gestor"} onValueChange={(value) => handleChange('gestorId', value === 'sin-gestor' ? '' : value)}>
                       <SelectTrigger>
                         <SelectValue placeholder="Seleccionar gestor..." />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Sin gestor asignado</SelectItem>
-                        {gestores.map((gestor) => (
-                          <SelectItem key={gestor.id} value={gestor.id}>
-                            {gestor.name} ({gestor.role})
+                        <SelectItem value="sin-gestor">Sin gestor asignado</SelectItem>
+                        {gestores?.map?.((gestor) => (
+                          <SelectItem key={gestor.id} value={gestor.id || "sin-gestor"}>
+                            {gestor.name || gestor.email || 'Sin nombre'} ({gestor.role})
                           </SelectItem>
-                        ))}
+                        )) || []}
                       </SelectContent>
                     </Select>
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="vendedorId">Vendedor Asignado</Label>
-                    <Select value={form.vendedorId} onValueChange={(value) => handleChange('vendedorId', value)}>
+                    <Select value={form.vendedorId || "sin-vendedor"} onValueChange={(value) => handleChange('vendedorId', value === 'sin-vendedor' ? '' : value)}>
                       <SelectTrigger>
                         <SelectValue placeholder="Seleccionar vendedor..." />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Sin vendedor asignado</SelectItem>
-                        {vendedores.map((vendedor) => (
-                          <SelectItem key={vendedor.id} value={vendedor.id}>
-                            {vendedor.name} ({vendedor.role})
+                        <SelectItem value="sin-vendedor">Sin vendedor asignado</SelectItem>
+                        {vendedores?.map?.((vendedor) => (
+                          <SelectItem key={vendedor.id} value={vendedor.id || "sin-vendedor"}>
+                            {vendedor.name || vendedor.email || 'Sin nombre'} ({vendedor.role})
                           </SelectItem>
-                        ))}
+                        )) || []}
                       </SelectContent>
                     </Select>
                   </div>
