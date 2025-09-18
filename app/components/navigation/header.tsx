@@ -39,6 +39,20 @@ export function Header({ title, description }: HeaderProps) {
     }
   };
 
+  const handleProfile = () => {
+    toast({
+      title: "Mi Perfil",
+      description: "Función de perfil en desarrollo",
+    });
+  };
+
+  const handleSettings = () => {
+    toast({
+      title: "Configuración",
+      description: "Panel de configuración en desarrollo",
+    });
+  };
+
   const getUserInitials = () => {
     const firstName = session?.user?.firstName;
     const lastName = session?.user?.lastName;
@@ -112,11 +126,11 @@ export function Header({ title, description }: HeaderProps) {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={handleProfile}>
                 <User className="mr-2 h-4 w-4" />
                 <span>Mi Perfil</span>
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={handleSettings}>
                 <Settings className="mr-2 h-4 w-4" />
                 <span>Configuración</span>
               </DropdownMenuItem>

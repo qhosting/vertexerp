@@ -35,6 +35,7 @@ export default function CobranzaPage() {
   const { data: session, status } = useSession();
   const [clienteSeleccionado, setClienteSeleccionado] = useState<Cliente | null>(null);
   const [syncStatus, setSyncStatus] = useState({ pending: 0, lastSync: null as Date | null });
+  const [activeTab, setActiveTab] = useState('cobranza');
   const { isInitialized, isOnline } = useOfflineStorage();
 
   useEffect(() => {
@@ -176,7 +177,7 @@ export default function CobranzaPage() {
       </div>
 
       {/* Contenido principal con tabs */}
-      <Tabs defaultValue="cobranza" className="w-full">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="cobranza">Cobranza</TabsTrigger>
           <TabsTrigger value="configuracion">Tickets</TabsTrigger>

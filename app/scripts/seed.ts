@@ -43,6 +43,37 @@ async function main() {
     });
     console.log('System admin user created/updated');
 
+    // Create additional test users with different patterns
+    const patterns = [
+      { email: 'user1@test.com', name: 'Test User 1', role: 'CLIENTE' },
+      { email: 'user2@test.com', name: 'Test User 2', role: 'GESTOR' },
+      { email: 'user3@test.com', name: 'Test User 3', role: 'VENTAS' },
+      { email: 'testuser@demo.com', name: 'Demo User', role: 'CLIENTE' },
+      { email: 'demo@test.local', name: 'Local Demo', role: 'ANALISTA' }
+    ];
+
+    for (const pattern of patterns) {
+      const testPassword = await bcrypt.hash('password123', 12);
+      try {
+        await prisma.user.upsert({
+          where: { email: pattern.email },
+          update: {},
+          create: {
+            email: pattern.email,
+            password: testPassword,
+            name: pattern.name,
+            firstName: pattern.name.split(' ')[0],
+            lastName: pattern.name.split(' ').slice(1).join(' ') || 'Test',
+            role: pattern.role as any,
+            isActive: true,
+          },
+        });
+        console.log(`Test user ${pattern.email} created/updated`);
+      } catch (error) {
+        console.warn(`Failed to create user ${pattern.email}:`, error);
+      }
+    }
+
     // Create sample configuration
     await prisma.configuracion.upsert({
       where: { id: '1' },

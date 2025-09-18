@@ -54,8 +54,10 @@ export default function ClientesPage() {
   const canDelete = permissions?.clientes?.delete === true;
 
   useEffect(() => {
-    fetchClientes();
-  }, []);
+    if (session?.user) {
+      fetchClientes();
+    }
+  }, [session]);
 
   useEffect(() => {
     if (searchTerm) {
@@ -73,10 +75,15 @@ export default function ClientesPage() {
 
   const fetchClientes = async () => {
     try {
-      const response = await fetch('/api/clientes');
+      // Obtener código del gestor de la sesión (por defecto DQBOT)
+      const codigoGestor = (session?.user as any)?.codigo || 'DQBOT';
+      
+      const response = await fetch(`/api/clientes?codigo_gestor=${encodeURIComponent(codigoGestor)}`);
       if (response?.ok) {
         const data = await response.json();
         setClientes(data || []);
+      } else {
+        console.error('Error response:', response.status, response.statusText);
       }
     } catch (error) {
       console.error('Error fetching clientes:', error);

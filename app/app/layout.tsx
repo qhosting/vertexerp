@@ -13,7 +13,6 @@ export const metadata: Metadata = {
   title: "Sistema ERP - Gestión Empresarial",
   description: "Sistema integral para la gestión de recursos empresariales con módulos de ventas, cobranza, inventario y más. Funcionalidad offline para cobranza móvil.",
   manifest: "/manifest.json",
-  themeColor: "#2563eb",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -31,13 +30,15 @@ export const metadata: Metadata = {
       { url: "/icons/PWA-192.png", sizes: "192x192", type: "image/png" },
     ],
   },
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
-    viewportFit: "cover"
-  }
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
+  themeColor: "#2563eb",
 };
 
 export default function RootLayout({
