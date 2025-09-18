@@ -9,6 +9,10 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { RolePermissions } from '@/lib/types';
+import { ClienteDetailModal } from '@/components/clientes/cliente-detail-modal';
+import { ClienteFormModal } from '@/components/clientes/cliente-form-modal';
+import { ClienteImportModal } from '@/components/clientes/cliente-import-modal';
+import { toast } from 'react-hot-toast';
 import { 
   Plus, 
   Search, 
@@ -20,7 +24,8 @@ import {
   MoreHorizontal,
   Eye,
   Edit,
-  Trash2
+  Trash2,
+  Upload
 } from 'lucide-react';
 
 interface Cliente {
@@ -46,7 +51,13 @@ export default function ClientesPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredClientes, setFilteredClientes] = useState<Cliente[]>([]);
   const [showFilters, setShowFilters] = useState(false);
-  const [showNewClienteDialog, setShowNewClienteDialog] = useState(false);
+  
+  // Estados para modales
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [showFormModal, setShowFormModal] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [selectedClienteId, setSelectedClienteId] = useState<string | null>(null);
+  const [editingClienteId, setEditingClienteId] = useState<string | null>(null);
 
   const userRole = session?.user?.role;
   const permissions = userRole ? RolePermissions[userRole] : null;
@@ -122,29 +133,64 @@ export default function ClientesPage() {
   };
 
   const handleNewCliente = () => {
-    setShowNewClienteDialog(true);
+    setEditingClienteId(null);
+    setShowFormModal(true);
   };
 
   const handleImportClientes = () => {
-    // TODO: Implementar funcionalidad de importar
-    alert('Función de importar clientes en desarrollo');
+    setShowImportModal(true);
   };
 
   const handleViewCliente = (clienteId: string) => {
-    // TODO: Implementar vista detallada del cliente
-    alert(`Ver detalles del cliente: ${clienteId}`);
+    setSelectedClienteId(clienteId);
+    setShowDetailModal(true);
   };
 
   const handleEditCliente = (clienteId: string) => {
-    // TODO: Implementar edición del cliente
-    alert(`Editar cliente: ${clienteId}`);
+    setEditingClienteId(clienteId);
+    setShowFormModal(true);
   };
 
-  const handleDeleteCliente = (clienteId: string) => {
-    // TODO: Implementar confirmación y eliminación
-    if (confirm('¿Estás seguro de que quieres eliminar este cliente?')) {
-      alert(`Eliminar cliente: ${clienteId}`);
+  const handleDeleteCliente = async (clienteId: string) => {
+    if (!confirm('¿Estás seguro de que quieres eliminar este cliente?')) {
+      return;
     }
+
+    try {
+      const response = await fetch(`/api/clientes/${clienteId}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        toast.success('Cliente eliminado exitosamente');
+        // Remover el cliente de la lista local
+        setClientes(prev => prev.filter(c => c.id !== clienteId));
+      } else {
+        toast.error('Error al eliminar el cliente');
+      }
+    } catch (error) {
+      console.error('Error deleting cliente:', error);
+      toast.error('Error al eliminar el cliente');
+    }
+  };
+
+  const handleModalSuccess = () => {
+    // Recargar la lista de clientes después de crear/editar
+    fetchClientes();
+  };
+
+  const handleEditFromDetail = (clienteId: string) => {
+    setShowDetailModal(false);
+    setEditingClienteId(clienteId);
+    setShowFormModal(true);
+  };
+
+  const closeModals = () => {
+    setShowDetailModal(false);
+    setShowFormModal(false);
+    setShowImportModal(false);
+    setSelectedClienteId(null);
+    setEditingClienteId(null);
   };
 
   if (loading) {
@@ -188,7 +234,7 @@ export default function ClientesPage() {
             </Button>
           )}
           <Button variant="outline" onClick={handleImportClientes}>
-            <Users className="mr-2 h-4 w-4" />
+            <Upload className="mr-2 h-4 w-4" />
             Importar
           </Button>
         </div>
@@ -361,6 +407,27 @@ export default function ClientesPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Modales */}
+      <ClienteDetailModal
+        isOpen={showDetailModal}
+        onClose={() => setShowDetailModal(false)}
+        clienteId={selectedClienteId || ''}
+        onEdit={handleEditFromDetail}
+      />
+
+      <ClienteFormModal
+        isOpen={showFormModal}
+        onClose={() => setShowFormModal(false)}
+        clienteId={editingClienteId || undefined}
+        onSuccess={handleModalSuccess}
+      />
+
+      <ClienteImportModal
+        isOpen={showImportModal}
+        onClose={() => setShowImportModal(false)}
+        onSuccess={handleModalSuccess}
+      />
     </div>
   );
 }

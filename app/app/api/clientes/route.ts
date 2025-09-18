@@ -49,72 +49,56 @@ export async function GET(request: NextRequest) {
     // await connection.end();
 
     // Por ahora devolvemos datos de ejemplo basados en el SQL proporcionado
+    // Convertimos el formato para que coincida con la interfaz Cliente del frontend
     const clientesEjemplo = [
       {
-        cod_cliente: 'DQ2207185',
-        nombre_ccliente: 'FERNANDO RIVERA RAMIREZ',
-        codigo_gestor: codigoGestor,
-        periodicidad_cliente: 'QUINCENAL',
-        pagos_cliente: 1071,
-        calle_dom: 'EL JARAL',
-        exterior_dom: 'SN',
-        interior_dom: '',
-        colonia_dom: 'EL JARAL',
-        municipio_dom: 'Corregidora',
-        tel1_cliente: '4426056846',
-        saldo_actualcli: '5962',
-        dia_cobro: 'SABADO',
-        semv: '0',
-        semdv: '0',
-        lat_dom: '',
-        long_dom: ''
+        id: 'cli-001',
+        codigoCliente: 'DQ2207185',
+        nombre: 'FERNANDO RIVERA RAMIREZ',
+        telefono1: '4426056846',
+        municipio: 'Corregidora',
+        estado: 'Querétaro',
+        saldoActual: 5962,
+        pagosPeriodicos: 1071,
+        periodicidad: 'QUINCENAL',
+        status: 'ACTIVO',
+        diaCobro: 'SABADO',
+        gestor: { firstName: 'Bot', lastName: 'DQ' },
+        vendedor: { firstName: 'Ventas', lastName: 'Sistema' }
       },
       {
-        cod_cliente: 'DQ2209197',
-        nombre_ccliente: 'VICTORIA RAMOS MONTOYA',
-        codigo_gestor: codigoGestor,
-        periodicidad_cliente: 'MENSUAL',
-        pagos_cliente: 1320,
-        calle_dom: 'SIERRA DE LAS CRUCES',
-        exterior_dom: '5',
-        interior_dom: '25',
-        colonia_dom: 'HDA LA CRUZ',
-        municipio_dom: 'El Marqués',
-        tel1_cliente: '4425554623',
-        saldo_actualcli: '22381.01',
-        dia_cobro: 'SABADO',
-        semv: '1027',
-        semdv: '22381.01',
-        lat_dom: '',
-        long_dom: ''
+        id: 'cli-002',
+        codigoCliente: 'DQ2209197',
+        nombre: 'VICTORIA RAMOS MONTOYA',
+        telefono1: '4425554623',
+        municipio: 'El Marqués',
+        estado: 'Querétaro',
+        saldoActual: 22381.01,
+        pagosPeriodicos: 1320,
+        periodicidad: 'MENSUAL',
+        status: 'ACTIVO',
+        diaCobro: 'SABADO',
+        gestor: { firstName: 'Bot', lastName: 'DQ' },
+        vendedor: { firstName: 'Ventas', lastName: 'Sistema' }
       },
       {
-        cod_cliente: 'DQ2301139',
-        nombre_ccliente: 'LILIA BOTELLO LOPEZ',
-        codigo_gestor: codigoGestor,
-        periodicidad_cliente: 'SEMANAL',
-        pagos_cliente: 120,
-        calle_dom: 'IGNACIO ZARAGOZA',
-        exterior_dom: '45A',
-        interior_dom: '',
-        colonia_dom: 'CENTRO',
-        municipio_dom: 'San Juan del Río',
-        tel1_cliente: '7297521774',
-        saldo_actualcli: '1493.01',
-        dia_cobro: 'VIERNES',
-        semv: '633',
-        semdv: '1493.01',
-        lat_dom: '',
-        long_dom: ''
+        id: 'cli-003',
+        codigoCliente: 'DQ2301139',
+        nombre: 'LILIA BOTELLO LOPEZ',
+        telefono1: '7297521774',
+        municipio: 'San Juan del Río',
+        estado: 'Querétaro',
+        saldoActual: 1493.01,
+        pagosPeriodicos: 120,
+        periodicidad: 'SEMANAL',
+        status: 'ACTIVO',
+        diaCobro: 'VIERNES',
+        gestor: { firstName: 'Bot', lastName: 'DQ' },
+        vendedor: { firstName: 'Ventas', lastName: 'Sistema' }
       }
     ];
 
-    // Filtrar por código de gestor si es necesario
-    const clientesFiltrados = clientesEjemplo.filter(
-      cliente => cliente.codigo_gestor === codigoGestor
-    );
-
-    return NextResponse.json(clientesFiltrados, { status: 200 });
+    return NextResponse.json(clientesEjemplo, { status: 200 });
     
   } catch (error) {
     console.error('Error obteniendo clientes:', error);
