@@ -44,6 +44,15 @@ interface ClienteForm {
   status: string;
   diaCobro: string;
   observaciones: string;
+  gestorId: string;
+  vendedorId: string;
+}
+
+interface UserOption {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
 }
 
 const initialForm: ClienteForm = {
@@ -63,27 +72,51 @@ const initialForm: ClienteForm = {
   periodicidad: 'SEMANAL',
   status: 'ACTIVO',
   diaCobro: 'LUNES',
-  observaciones: ''
+  observaciones: '',
+  gestorId: '',
+  vendedorId: ''
 };
 
 export function ClienteFormModal({ isOpen, onClose, clienteId, onSuccess }: ClienteFormModalProps) {
   const [form, setForm] = useState<ClienteForm>(initialForm);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [gestores, setGestores] = useState<UserOption[]>([]);
+  const [vendedores, setVendedores] = useState<UserOption[]>([]);
+  const [loadingUsers, setLoadingUsers] = useState(false);
 
   const isEdit = Boolean(clienteId);
 
   useEffect(() => {
-    if (isOpen && clienteId) {
-      fetchCliente();
-    } else if (isOpen && !clienteId) {
-      setForm({ ...initialForm, codigoCliente: generateClientCode() });
+    if (isOpen) {
+      fetchUsers();
+      if (clienteId) {
+        fetchCliente();
+      } else {
+        setForm({ ...initialForm, codigoCliente: generateClientCode() });
+      }
     }
   }, [isOpen, clienteId]);
 
   const generateClientCode = () => {
     const timestamp = Date.now().toString().slice(-6);
     return `CLI-${timestamp}`;
+  };
+
+  const fetchUsers = async () => {
+    setLoadingUsers(true);
+    try {
+      const response = await fetch('/api/users');
+      if (response.ok) {
+        const users = await response.json();
+        setGestores(users.filter((user: UserOption) => user.role === 'GESTOR' || user.role === 'ADMIN' || user.role === 'SUPERADMIN'));
+        setVendedores(users.filter((user: UserOption) => user.role === 'VENTAS' || user.role === 'ADMIN' || user.role === 'SUPERADMIN'));
+      }
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    } finally {
+      setLoadingUsers(false);
+    }
   };
 
   const fetchCliente = async () => {
@@ -109,7 +142,9 @@ export function ClienteFormModal({ isOpen, onClose, clienteId, onSuccess }: Clie
           periodicidad: cliente.periodicidad || 'SEMANAL',
           status: cliente.status || 'ACTIVO',
           diaCobro: cliente.diaCobro || 'LUNES',
-          observaciones: cliente.observaciones || ''
+          observaciones: cliente.observaciones || '',
+          gestorId: cliente.gestorId || '',
+          vendedorId: cliente.vendedorId || ''
         });
       }
     } catch (error) {
@@ -136,6 +171,8 @@ export function ClienteFormModal({ isOpen, onClose, clienteId, onSuccess }: Clie
         body: JSON.stringify({
           ...form,
           pagosPeriodicos: parseFloat(form.pagosPeriodicos) || 0,
+          gestorId: form.gestorId || null,
+          vendedorId: form.vendedorId || null,
         }),
       });
 
@@ -255,6 +292,40 @@ export function ClienteFormModal({ isOpen, onClose, clienteId, onSuccess }: Clie
                         <SelectItem value="INACTIVO">Inactivo</SelectItem>
                         <SelectItem value="PROSPECTO">Prospecto</SelectItem>
                         <SelectItem value="BLOQUEADO">Bloqueado</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="gestorId">Gestor Asignado</Label>
+                    <Select value={form.gestorId} onValueChange={(value) => handleChange('gestorId', value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Seleccionar gestor..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="">Sin gestor asignado</SelectItem>
+                        {gestores.map((gestor) => (
+                          <SelectItem key={gestor.id} value={gestor.id}>
+                            {gestor.name} ({gestor.role})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="vendedorId">Vendedor Asignado</Label>
+                    <Select value={form.vendedorId} onValueChange={(value) => handleChange('vendedorId', value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Seleccionar vendedor..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="">Sin vendedor asignado</SelectItem>
+                        {vendedores.map((vendedor) => (
+                          <SelectItem key={vendedor.id} value={vendedor.id}>
+                            {vendedor.name} ({vendedor.role})
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>

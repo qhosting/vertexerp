@@ -62,11 +62,11 @@ async function main() {
 
     // Create additional test users with different patterns
     const patterns = [
-      { email: 'user1@test.com', name: 'Test User 1', role: 'CLIENTE' },
-      { email: 'user2@test.com', name: 'Test User 2', role: 'GESTOR' },
-      { email: 'user3@test.com', name: 'Test User 3', role: 'VENTAS' },
-      { email: 'testuser@demo.com', name: 'Demo User', role: 'CLIENTE' },
-      { email: 'demo@test.local', name: 'Local Demo', role: 'ANALISTA' }
+      { email: 'gestor1@sistema.com', name: 'María Gestor', role: 'GESTOR', firstName: 'María', lastName: 'Gestor' },
+      { email: 'gestor2@sistema.com', name: 'Carlos Gestor', role: 'GESTOR', firstName: 'Carlos', lastName: 'Gestor' },
+      { email: 'vendedor1@sistema.com', name: 'Ana Vendedor', role: 'VENTAS', firstName: 'Ana', lastName: 'Vendedor' },
+      { email: 'vendedor2@sistema.com', name: 'Luis Vendedor', role: 'VENTAS', firstName: 'Luis', lastName: 'Vendedor' },
+      { email: 'analista@sistema.com', name: 'Pedro Analista', role: 'ANALISTA', firstName: 'Pedro', lastName: 'Analista' }
     ];
 
     for (const pattern of patterns) {
@@ -79,8 +79,8 @@ async function main() {
             email: pattern.email,
             password: testPassword,
             name: pattern.name,
-            firstName: pattern.name.split(' ')[0],
-            lastName: pattern.name.split(' ').slice(1).join(' ') || 'Test',
+            firstName: pattern.firstName || pattern.name.split(' ')[0],
+            lastName: pattern.lastName || pattern.name.split(' ').slice(1).join(' ') || 'Test',
             role: pattern.role as any,
             isActive: true,
           },

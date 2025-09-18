@@ -1,5 +1,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { prisma } from '@/lib/db';
 
 // GET /api/clientes/[id] - Obtener cliente por ID
 export async function GET(
@@ -7,114 +10,40 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    // Datos simulados de clientes
-    const clientesSimulados = {
-      'cli-001': {
-        id: 'cli-001',
-        codigoCliente: 'DQ2207185',
-        nombre: 'FERNANDO RIVERA RAMIREZ',
-        telefono1: '4426056846',
-        telefono2: '',
-        email: 'fernando.rivera@email.com',
-        municipio: 'Corregidora',
-        estado: 'Querétaro',
-        colonia: 'EL JARAL',
-        calle: 'EL JARAL',
-        numeroExterior: 'SN',
-        numeroInterior: '',
-        codigoPostal: '76900',
-        saldoActual: 5962,
-        pagosPeriodicos: 1071,
-        periodicidad: 'QUINCENAL',
-        status: 'ACTIVO',
-        diaCobro: 'SABADO',
-        fechaAlta: '2022-07-18T10:30:00.000Z',
-        observaciones: 'Cliente regular de cobranza quincenal',
-        gestor: { firstName: 'Bot', lastName: 'DQ' },
-        vendedor: { firstName: 'Ventas', lastName: 'Sistema' },
-        ultimosPagos: [
-          {
-            fecha: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-            monto: 1071,
-            concepto: 'Pago quincenal'
-          },
-          {
-            fecha: new Date(Date.now() - 21 * 24 * 60 * 60 * 1000).toISOString(),
-            monto: 1071,
-            concepto: 'Pago quincenal'
-          }
-        ]
-      },
-      'cli-002': {
-        id: 'cli-002',
-        codigoCliente: 'DQ2209197',
-        nombre: 'VICTORIA RAMOS MONTOYA',
-        telefono1: '4425554623',
-        telefono2: '',
-        email: 'victoria.ramos@email.com',
-        municipio: 'El Marqués',
-        estado: 'Querétaro',
-        colonia: 'HDA LA CRUZ',
-        calle: 'SIERRA DE LAS CRUCES',
-        numeroExterior: '5',
-        numeroInterior: '25',
-        codigoPostal: '76240',
-        saldoActual: 22381.01,
-        pagosPeriodicos: 1320,
-        periodicidad: 'MENSUAL',
-        status: 'ACTIVO',
-        diaCobro: 'SABADO',
-        fechaAlta: '2022-09-19T14:15:00.000Z',
-        observaciones: 'Cliente con pago mensual alto',
-        gestor: { firstName: 'Bot', lastName: 'DQ' },
-        vendedor: { firstName: 'Ventas', lastName: 'Sistema' },
-        ultimosPagos: [
-          {
-            fecha: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
-            monto: 1320,
-            concepto: 'Pago mensual'
-          }
-        ]
-      },
-      'cli-003': {
-        id: 'cli-003',
-        codigoCliente: 'DQ2301139',
-        nombre: 'LILIA BOTELLO LOPEZ',
-        telefono1: '7297521774',
-        telefono2: '',
-        email: 'lilia.botello@email.com',
-        municipio: 'San Juan del Río',
-        estado: 'Querétaro',
-        colonia: 'CENTRO',
-        calle: 'IGNACIO ZARAGOZA',
-        numeroExterior: '45A',
-        numeroInterior: '',
-        codigoPostal: '76800',
-        saldoActual: 1493.01,
-        pagosPeriodicos: 120,
-        periodicidad: 'SEMANAL',
-        status: 'ACTIVO',
-        diaCobro: 'VIERNES',
-        fechaAlta: '2023-01-13T09:45:00.000Z',
-        observaciones: 'Cliente con pago semanal pequeño',
-        gestor: { firstName: 'Bot', lastName: 'DQ' },
-        vendedor: { firstName: 'Ventas', lastName: 'Sistema' },
-        ultimosPagos: [
-          {
-            fecha: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-            monto: 120,
-            concepto: 'Pago semanal'
-          },
-          {
-            fecha: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
-            monto: 120,
-            concepto: 'Pago semanal'
-          }
-        ]
-      }
-    };
+    const session = await getServerSession(authOptions);
+    
+    if (!session?.user) {
+      return NextResponse.json(
+        { error: 'No autorizado' },
+        { status: 401 }
+      );
+    }
 
-    const cliente = clientesSimulados[params.id as keyof typeof clientesSimulados];
+    const cliente = await prisma.cliente.findUnique({
+      where: { id: params.id },
+      include: {
+        gestor: {
+          select: {
+            id: true,
+            name: true,
+            firstName: true,
+            lastName: true,
+            role: true
+          }
+        },
+        pagos: {
+          take: 5,
+          orderBy: { fechaPago: 'desc' },
+          select: {
+            id: true,
+            monto: true,
+            fechaPago: true,
+            referencia: true,
+            tipoPago: true
+          }
+        }
+      }
+    });
 
     if (!cliente) {
       return NextResponse.json(
@@ -123,7 +52,18 @@ export async function GET(
       );
     }
 
-    return NextResponse.json(cliente);
+    // Formatear la respuesta para incluir los últimos pagos
+    const clienteConPagos = {
+      ...cliente,
+      ultimosPagos: cliente.pagos?.map(pago => ({
+        fecha: pago.fechaPago.toISOString(),
+        monto: pago.monto,
+        concepto: pago.referencia || 'Pago',
+        metodoPago: pago.tipoPago
+      })) || []
+    };
+
+    return NextResponse.json(clienteConPagos);
   } catch (error) {
     console.error('Error fetching cliente:', error);
     return NextResponse.json(
@@ -139,15 +79,114 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    const body = await request.json();
+    const session = await getServerSession(authOptions);
     
-    // En un sistema real, aquí actualizarías en la base de datos
-    // Por ahora solo simulamos la respuesta exitosa
-    const updatedCliente = {
-      id: params.id,
-      ...body,
-      updatedAt: new Date().toISOString()
-    };
+    if (!session?.user) {
+      return NextResponse.json(
+        { error: 'No autorizado' },
+        { status: 401 }
+      );
+    }
+
+    const body = await request.json();
+    const {
+      codigoCliente,
+      nombre,
+      telefono1,
+      telefono2,
+      email,
+      municipio,
+      estado,
+      colonia,
+      calle,
+      numeroExterior,
+      numeroInterior,
+      codigoPostal,
+      pagosPeriodicos,
+      periodicidad,
+      status,
+      diaCobro,
+      gestorId,
+      vendedorId,
+      ...rest
+    } = body;
+
+    // Verificar que el cliente existe
+    const clienteExistente = await prisma.cliente.findUnique({
+      where: { id: params.id }
+    });
+
+    if (!clienteExistente) {
+      return NextResponse.json(
+        { error: 'Cliente no encontrado' },
+        { status: 404 }
+      );
+    }
+
+    // Verificar que el gestor existe (si se proporciona)
+    if (gestorId && gestorId !== '') {
+      const gestor = await prisma.user.findUnique({
+        where: { id: gestorId },
+        select: { id: true, role: true }
+      });
+      
+      if (!gestor || !['GESTOR', 'ADMIN', 'SUPERADMIN'].includes(gestor.role)) {
+        return NextResponse.json(
+          { error: 'Gestor no válido' },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Verificar que el vendedor existe (si se proporciona)
+    if (vendedorId && vendedorId !== '') {
+      const vendedor = await prisma.user.findUnique({
+        where: { id: vendedorId },
+        select: { id: true, role: true }
+      });
+      
+      if (!vendedor || !['VENTAS', 'ADMIN', 'SUPERADMIN'].includes(vendedor.role)) {
+        return NextResponse.json(
+          { error: 'Vendedor no válido' },
+          { status: 400 }
+        );
+      }
+    }
+
+    const updatedCliente = await prisma.cliente.update({
+      where: { id: params.id },
+      data: {
+        nombre: nombre?.trim(),
+        telefono1: telefono1?.trim(),
+        telefono2: telefono2?.trim() || null,
+        email: email?.trim() || null,
+        municipio: municipio?.trim() || null,
+        estado: estado?.trim() || null,
+        colonia: colonia?.trim() || null,
+        calle: calle?.trim() || null,
+        numeroExterior: numeroExterior?.trim() || null,
+        numeroInterior: numeroInterior?.trim() || null,
+        codigoPostal: codigoPostal?.trim() || null,
+        pagosPeriodicos: typeof pagosPeriodicos === 'number' ? pagosPeriodicos : parseFloat(pagosPeriodicos) || 0,
+        periodicidad: periodicidad || 'SEMANAL',
+        status: status || 'ACTIVO',
+        diaCobro: diaCobro || null,
+        gestorId: gestorId || null,
+        vendedorId: vendedorId || null,
+        ultimaActualizacion: new Date()
+      },
+      include: {
+        gestor: {
+          select: {
+            id: true,
+            name: true,
+            firstName: true,
+            lastName: true,
+            role: true
+          }
+        }
+      }
+    });
 
     return NextResponse.json(updatedCliente);
   } catch (error) {
@@ -165,11 +204,39 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    // En un sistema real, aquí verificarías y eliminarías/desactivarías el cliente
-    // Por ahora solo simulamos la respuesta exitosa
+    const session = await getServerSession(authOptions);
+    
+    if (!session?.user) {
+      return NextResponse.json(
+        { error: 'No autorizado' },
+        { status: 401 }
+      );
+    }
+
+    // Verificar permisos - solo ADMIN y SUPERADMIN pueden eliminar
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email! },
+      select: { role: true }
+    });
+
+    if (!user || !['ADMIN', 'SUPERADMIN'].includes(user.role)) {
+      return NextResponse.json(
+        { error: 'Sin permisos para eliminar clientes' },
+        { status: 403 }
+      );
+    }
+
+    // En lugar de eliminar, desactivamos el cliente
+    await prisma.cliente.update({
+      where: { id: params.id },
+      data: { 
+        status: 'INACTIVO',
+        ultimaActualizacion: new Date()
+      }
+    });
     
     return NextResponse.json({ 
-      message: 'Cliente eliminado exitosamente',
+      message: 'Cliente desactivado exitosamente',
       id: params.id
     });
   } catch (error) {
