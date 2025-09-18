@@ -7,6 +7,18 @@ import { Button } from '@/components/ui/button';
 import { Smartphone, Download, RefreshCw, MapPin } from 'lucide-react';
 
 export default function CobranzaMovilPage() {
+  const handleSyncOffline = () => {
+    alert('Sincronización offline iniciada');
+  };
+
+  const handleViewLocations = () => {
+    alert('Función de geolocalización en desarrollo');
+  };
+
+  const handleUploadData = () => {
+    alert('Subiendo datos al servidor...');
+  };
+
   return (
     <div className="space-y-6 p-6">
       <Header 
@@ -23,7 +35,7 @@ export default function CobranzaMovilPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <Button className="w-full">
+            <Button className="w-full" onClick={handleSyncOffline}>
               Sincronizar Offline
             </Button>
           </CardContent>
@@ -37,7 +49,7 @@ export default function CobranzaMovilPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <Button className="w-full" variant="outline">
+            <Button className="w-full" variant="outline" onClick={handleViewLocations}>
               Ver Ubicaciones
             </Button>
           </CardContent>
@@ -51,7 +63,7 @@ export default function CobranzaMovilPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <Button className="w-full" variant="outline">
+            <Button className="w-full" variant="outline" onClick={handleUploadData}>
               Subir Datos
             </Button>
           </CardContent>

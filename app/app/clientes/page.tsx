@@ -45,6 +45,8 @@ export default function ClientesPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredClientes, setFilteredClientes] = useState<Cliente[]>([]);
+  const [showFilters, setShowFilters] = useState(false);
+  const [showNewClienteDialog, setShowNewClienteDialog] = useState(false);
 
   const userRole = session?.user?.role;
   const permissions = userRole ? RolePermissions[userRole] : null;
@@ -108,6 +110,36 @@ export default function ClientesPage() {
     }).format(amount);
   };
 
+  const handleShowFilters = () => {
+    setShowFilters(!showFilters);
+  };
+
+  const handleNewCliente = () => {
+    setShowNewClienteDialog(true);
+  };
+
+  const handleImportClientes = () => {
+    // TODO: Implementar funcionalidad de importar
+    alert('Función de importar clientes en desarrollo');
+  };
+
+  const handleViewCliente = (clienteId: string) => {
+    // TODO: Implementar vista detallada del cliente
+    alert(`Ver detalles del cliente: ${clienteId}`);
+  };
+
+  const handleEditCliente = (clienteId: string) => {
+    // TODO: Implementar edición del cliente
+    alert(`Editar cliente: ${clienteId}`);
+  };
+
+  const handleDeleteCliente = (clienteId: string) => {
+    // TODO: Implementar confirmación y eliminación
+    if (confirm('¿Estás seguro de que quieres eliminar este cliente?')) {
+      alert(`Eliminar cliente: ${clienteId}`);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -135,7 +167,7 @@ export default function ClientesPage() {
               className="pl-8 w-64"
             />
           </div>
-          <Button variant="outline">
+          <Button variant="outline" onClick={handleShowFilters}>
             <Filter className="mr-2 h-4 w-4" />
             Filtros
           </Button>
@@ -143,12 +175,12 @@ export default function ClientesPage() {
 
         <div className="flex items-center space-x-2">
           {canWrite && (
-            <Button>
+            <Button onClick={handleNewCliente}>
               <Plus className="mr-2 h-4 w-4" />
               Nuevo Cliente
             </Button>
           )}
-          <Button variant="outline">
+          <Button variant="outline" onClick={handleImportClientes}>
             <Users className="mr-2 h-4 w-4" />
             Importar
           </Button>
@@ -296,20 +328,20 @@ export default function ClientesPage() {
                       </td>
                       <td className="py-3 px-4 text-right">
                         <div className="flex items-center justify-end space-x-2">
-                          <Button variant="ghost" size="sm">
+                          <Button variant="ghost" size="sm" onClick={() => handleViewCliente(cliente?.id)}>
                             <Eye className="h-4 w-4" />
                           </Button>
                           {canWrite && (
-                            <Button variant="ghost" size="sm">
+                            <Button variant="ghost" size="sm" onClick={() => handleEditCliente(cliente?.id)}>
                               <Edit className="h-4 w-4" />
                             </Button>
                           )}
                           {canDelete && (
-                            <Button variant="ghost" size="sm">
+                            <Button variant="ghost" size="sm" onClick={() => handleDeleteCliente(cliente?.id)}>
                               <Trash2 className="h-4 w-4 text-red-600" />
                             </Button>
                           )}
-                          <Button variant="ghost" size="sm">
+                          <Button variant="ghost" size="sm" onClick={() => alert('Más opciones disponibles próximamente')}>
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </div>

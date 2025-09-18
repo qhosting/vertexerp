@@ -9,6 +9,18 @@ import { Label } from '@/components/ui/label';
 import { Settings, Save, Upload, Palette } from 'lucide-react';
 
 export default function ConfiguracionPage() {
+  const handleSaveChanges = () => {
+    alert('Configuración guardada exitosamente');
+  };
+
+  const handleSaveInfo = () => {
+    alert('Información de empresa guardada exitosamente');
+  };
+
+  const handleUploadLogo = () => {
+    alert('Función de subir logo en desarrollo');
+  };
+
   return (
     <div className="space-y-6 p-6">
       <Header 
@@ -35,7 +47,7 @@ export default function ConfiguracionPage() {
               <Label htmlFor="logo">Logo de la Empresa</Label>
               <div className="flex items-center space-x-2">
                 <Input id="logo" placeholder="URL del logo" />
-                <Button variant="outline">
+                <Button variant="outline" onClick={handleUploadLogo}>
                   <Upload className="h-4 w-4" />
                 </Button>
               </div>
@@ -52,7 +64,7 @@ export default function ConfiguracionPage() {
               </div>
             </div>
 
-            <Button className="w-full">
+            <Button className="w-full" onClick={handleSaveChanges}>
               <Save className="mr-2 h-4 w-4" />
               Guardar Cambios
             </Button>
@@ -85,7 +97,7 @@ export default function ConfiguracionPage() {
               <Input id="email" type="email" placeholder="contacto@empresa.com" />
             </div>
 
-            <Button className="w-full">
+            <Button className="w-full" onClick={handleSaveInfo}>
               <Save className="mr-2 h-4 w-4" />
               Guardar Información
             </Button>

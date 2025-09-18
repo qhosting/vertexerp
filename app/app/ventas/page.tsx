@@ -5,6 +5,7 @@ import { Header } from '@/components/navigation/header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ShoppingCart, Plus, Search, Filter } from 'lucide-react';
+import { showFilters, showNewItem } from '@/lib/button-handlers';
 
 export default function VentasPage() {
   return (
@@ -16,16 +17,16 @@ export default function VentasPage() {
 
       <div className="flex justify-between items-center">
         <div className="flex items-center space-x-2">
-          <Button variant="outline">
+          <Button variant="outline" onClick={() => alert('Buscar - Funcionalidad en desarrollo')}>
             <Search className="mr-2 h-4 w-4" />
             Buscar
           </Button>
-          <Button variant="outline">
+          <Button variant="outline" onClick={showFilters}>
             <Filter className="mr-2 h-4 w-4" />
             Filtros
           </Button>
         </div>
-        <Button>
+        <Button onClick={() => showNewItem('venta')}>
           <Plus className="mr-2 h-4 w-4" />
           Nueva Venta
         </Button>

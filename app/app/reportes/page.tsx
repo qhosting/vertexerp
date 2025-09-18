@@ -5,6 +5,7 @@ import { Header } from '@/components/navigation/header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { BarChart3, Download, Calendar, Filter } from 'lucide-react';
+import { showFilters, showExport, showGenerate } from '@/lib/button-handlers';
 
 export default function ReportesPage() {
   return (
@@ -16,16 +17,16 @@ export default function ReportesPage() {
 
       <div className="flex justify-between items-center">
         <div className="flex items-center space-x-2">
-          <Button variant="outline">
+          <Button variant="outline" onClick={() => alert('Seleccionar período - Funcionalidad en desarrollo')}>
             <Calendar className="mr-2 h-4 w-4" />
             Período
           </Button>
-          <Button variant="outline">
+          <Button variant="outline" onClick={showFilters}>
             <Filter className="mr-2 h-4 w-4" />
             Filtros
           </Button>
         </div>
-        <Button>
+        <Button onClick={showExport}>
           <Download className="mr-2 h-4 w-4" />
           Exportar
         </Button>
@@ -37,7 +38,7 @@ export default function ReportesPage() {
             <CardTitle className="text-sm">Ventas por Período</CardTitle>
           </CardHeader>
           <CardContent>
-            <Button className="w-full" variant="outline">
+            <Button className="w-full" variant="outline" onClick={() => showGenerate('reporte de ventas')}>
               Generar Reporte
             </Button>
           </CardContent>
@@ -48,7 +49,7 @@ export default function ReportesPage() {
             <CardTitle className="text-sm">Cobranza por Gestor</CardTitle>
           </CardHeader>
           <CardContent>
-            <Button className="w-full" variant="outline">
+            <Button className="w-full" variant="outline" onClick={() => showGenerate('reporte de cobranza')}>
               Generar Reporte
             </Button>
           </CardContent>
@@ -59,7 +60,7 @@ export default function ReportesPage() {
             <CardTitle className="text-sm">Cartera Vencida</CardTitle>
           </CardHeader>
           <CardContent>
-            <Button className="w-full" variant="outline">
+            <Button className="w-full" variant="outline" onClick={() => showGenerate('reporte de cartera vencida')}>
               Generar Reporte
             </Button>
           </CardContent>
