@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
     });
 
     // Formatear datos para compatibilidad con offline storage
-    const formattedClientes = clientes.map(cliente => ({
+    const formattedClientes = clientes.map((cliente: any) => ({
       id: cliente.id,
       cod_cliente: cliente.codigoCliente,
       codigoCliente: cliente.codigoCliente,

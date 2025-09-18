@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
 
           resolve(NextResponse.json(result));
         })
-        .on('error', (error) => {
+        .on('error', (error: any) => {
           console.error('Error parsing CSV:', error);
           resolve(NextResponse.json(
             { 

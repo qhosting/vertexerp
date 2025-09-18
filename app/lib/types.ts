@@ -1,7 +1,10 @@
 
-import { UserRole, Periodicidad, StatusCliente, StatusVenta, TipoPago } from '@prisma/client';
-
-export type { UserRole, Periodicidad, StatusCliente, StatusVenta, TipoPago };
+// Definir tipos localmente para evitar problemas de importación de Prisma
+export type UserRole = 'SUPERADMIN' | 'ADMIN' | 'ANALISTA' | 'GESTOR' | 'CLIENTE' | 'VENTAS';
+export type Periodicidad = 'DIARIA' | 'SEMANAL' | 'QUINCENAL' | 'MENSUAL' | 'BIMENSUAL';
+export type StatusCliente = 'ACTIVO' | 'INACTIVO' | 'MOROSO' | 'BLOQUEADO' | 'PROSPECTO';
+export type StatusVenta = 'PENDIENTE' | 'CONFIRMADA' | 'ENTREGADA' | 'CANCELADA' | 'PAGADA';
+export type TipoPago = 'EFECTIVO' | 'TARJETA' | 'TRANSFERENCIA' | 'CHEQUE' | 'OTRO';
 
 export interface User {
   id: string;

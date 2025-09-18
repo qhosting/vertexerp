@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/db";
-import { UserRole } from "@prisma/client";
+import { UserRole } from "@/lib/types";
 
 export const dynamic = 'force-dynamic';
 

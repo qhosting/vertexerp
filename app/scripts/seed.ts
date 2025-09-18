@@ -1,5 +1,5 @@
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Periodicidad, StatusCliente } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
@@ -132,8 +132,8 @@ async function main() {
         codigoPostal: '76000',
         saldoActual: 15000,
         pagosPeriodicos: 2500,
-        periodicidad: 'SEMANAL',
-        status: 'ACTIVO',
+        periodicidad: Periodicidad.SEMANAL,
+        status: StatusCliente.ACTIVO,
         diaCobro: 'LUNES',
         gestorId: gestor?.id,
         vendedorId: vendedor?.id
@@ -151,8 +151,8 @@ async function main() {
         codigoPostal: '76020',
         saldoActual: 8500,
         pagosPeriodicos: 1700,
-        periodicidad: 'SEMANAL',
-        status: 'ACTIVO',
+        periodicidad: Periodicidad.SEMANAL,
+        status: StatusCliente.ACTIVO,
         diaCobro: 'MARTES',
         gestorId: gestor?.id,
         vendedorId: vendedor?.id
@@ -171,8 +171,8 @@ async function main() {
         codigoPostal: '76800',
         saldoActual: 12000,
         pagosPeriodicos: 3000,
-        periodicidad: 'QUINCENAL',
-        status: 'MOROSO',
+        periodicidad: Periodicidad.QUINCENAL,
+        status: StatusCliente.MOROSO,
         diaCobro: 'MIERCOLES',
         gestorId: gestor?.id,
         vendedorId: vendedor?.id
@@ -190,8 +190,8 @@ async function main() {
         codigoPostal: '76900',
         saldoActual: 5500,
         pagosPeriodicos: 1100,
-        periodicidad: 'SEMANAL',
-        status: 'ACTIVO',
+        periodicidad: Periodicidad.SEMANAL,
+        status: StatusCliente.ACTIVO,
         diaCobro: 'JUEVES',
         gestorId: gestor?.id,
         vendedorId: vendedor?.id
@@ -210,8 +210,8 @@ async function main() {
         codigoPostal: '76246',
         saldoActual: 18500,
         pagosPeriodicos: 3700,
-        periodicidad: 'SEMANAL',
-        status: 'ACTIVO',
+        periodicidad: Periodicidad.SEMANAL,
+        status: StatusCliente.ACTIVO,
         diaCobro: 'VIERNES',
         gestorId: gestor?.id,
         vendedorId: vendedor?.id

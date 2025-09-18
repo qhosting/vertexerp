@@ -25,6 +25,7 @@ import {
   Wallet,
   BarChart3,
   Menu,
+  MessageCircle,
 } from 'lucide-react';
 
 interface NavItem {
@@ -71,6 +72,12 @@ const navItems: NavItem[] = [
     href: '/dashboard/cobranza-movil',
     icon: Smartphone,
     permission: 'cobranza',
+  },
+  {
+    title: 'Comunicación',
+    href: '/comunicacion',
+    icon: MessageCircle,
+    permission: 'clientes',
   },
   {
     title: 'Almacén',

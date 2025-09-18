@@ -57,7 +57,7 @@ export async function GET(
     // Formatear la respuesta para incluir los últimos pagos
     const clienteConPagos = {
       ...cliente,
-      ultimosPagos: cliente.pagos?.map(pago => ({
+      ultimosPagos: cliente.pagos?.map((pago: any) => ({
         fecha: pago.fechaPago.toISOString(),
         monto: pago.monto,
         concepto: pago.referencia || 'Pago',

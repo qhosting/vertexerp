@@ -12,6 +12,9 @@ import { RolePermissions } from '@/lib/types';
 import { ClienteDetailModal } from '@/components/clientes/cliente-detail-modal';
 import { ClienteFormModal } from '@/components/clientes/cliente-form-modal';
 import { ClienteImportModal } from '@/components/clientes/cliente-import-modal';
+import { WhatsAppModal } from '@/components/comunicacion/whatsapp-modal';
+import { SMSModal } from '@/components/comunicacion/sms-modal';
+import { BulkSMSModal } from '@/components/comunicacion/bulk-sms-modal';
 import { toast } from 'react-hot-toast';
 import { 
   Plus, 
@@ -25,7 +28,9 @@ import {
   Eye,
   Edit,
   Trash2,
-  Upload
+  Upload,
+  MessageCircle,
+  MessageSquare
 } from 'lucide-react';
 
 interface Cliente {
@@ -56,8 +61,12 @@ export default function ClientesPage() {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showFormModal, setShowFormModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
+  const [showWhatsAppModal, setShowWhatsAppModal] = useState(false);
+  const [showSMSModal, setShowSMSModal] = useState(false);
+  const [showBulkSMSModal, setShowBulkSMSModal] = useState(false);
   const [selectedClienteId, setSelectedClienteId] = useState<string | null>(null);
   const [editingClienteId, setEditingClienteId] = useState<string | null>(null);
+  const [comunicacionCliente, setComunicacionCliente] = useState<Cliente | null>(null);
 
   const userRole = session?.user?.role;
   const permissions = userRole ? RolePermissions[userRole] : null;
@@ -86,18 +95,24 @@ export default function ClientesPage() {
 
   const fetchClientes = async () => {
     try {
-      // Obtener código del gestor de la sesión (por defecto DQBOT)
-      const codigoGestor = (session?.user as any)?.codigo || 'DQBOT';
+      // Obtener ID del gestor de la sesión si es necesario
+      const gestorId = (session?.user as any)?.id;
       
-      const response = await fetch(`/api/clientes?codigo_gestor=${encodeURIComponent(codigoGestor)}`);
+      const url = gestorId && !['ADMIN', 'SUPERADMIN'].includes(session?.user?.role || '') 
+        ? `/api/clientes?gestorId=${encodeURIComponent(gestorId)}`
+        : '/api/clientes';
+      
+      const response = await fetch(url);
       if (response?.ok) {
         const data = await response.json();
         setClientes(data || []);
       } else {
         console.error('Error response:', response.status, response.statusText);
+        toast.error('Error al cargar clientes');
       }
     } catch (error) {
       console.error('Error fetching clientes:', error);
+      toast.error('Error al cargar clientes');
     } finally {
       setLoading(false);
     }
@@ -185,12 +200,30 @@ export default function ClientesPage() {
     setShowFormModal(true);
   };
 
+  const handleWhatsAppCliente = (cliente: Cliente) => {
+    setComunicacionCliente(cliente);
+    setShowWhatsAppModal(true);
+  };
+
+  const handleSMSCliente = (cliente: Cliente) => {
+    setComunicacionCliente(cliente);
+    setShowSMSModal(true);
+  };
+
+  const handleBulkSMS = () => {
+    setShowBulkSMSModal(true);
+  };
+
   const closeModals = () => {
     setShowDetailModal(false);
     setShowFormModal(false);
     setShowImportModal(false);
+    setShowWhatsAppModal(false);
+    setShowSMSModal(false);
+    setShowBulkSMSModal(false);
     setSelectedClienteId(null);
     setEditingClienteId(null);
+    setComunicacionCliente(null);
   };
 
   if (loading) {
@@ -236,6 +269,10 @@ export default function ClientesPage() {
           <Button variant="outline" onClick={handleImportClientes}>
             <Upload className="mr-2 h-4 w-4" />
             Importar
+          </Button>
+          <Button variant="outline" onClick={handleBulkSMS}>
+            <MessageSquare className="mr-2 h-4 w-4" />
+            SMS Masivo
           </Button>
         </div>
       </div>
@@ -380,7 +417,7 @@ export default function ClientesPage() {
                         </div>
                       </td>
                       <td className="py-3 px-4 text-right">
-                        <div className="flex items-center justify-end space-x-2">
+                        <div className="flex items-center justify-end space-x-1">
                           <Button variant="ghost" size="sm" onClick={() => handleViewCliente(cliente?.id)}>
                             <Eye className="h-4 w-4" />
                           </Button>
@@ -389,14 +426,21 @@ export default function ClientesPage() {
                               <Edit className="h-4 w-4" />
                             </Button>
                           )}
+                          {cliente?.telefono1 && (
+                            <>
+                              <Button variant="ghost" size="sm" onClick={() => handleWhatsAppCliente(cliente)} title="Enviar WhatsApp">
+                                <MessageCircle className="h-4 w-4 text-green-600" />
+                              </Button>
+                              <Button variant="ghost" size="sm" onClick={() => handleSMSCliente(cliente)} title="Enviar SMS">
+                                <MessageSquare className="h-4 w-4 text-blue-600" />
+                              </Button>
+                            </>
+                          )}
                           {canDelete && (
                             <Button variant="ghost" size="sm" onClick={() => handleDeleteCliente(cliente?.id)}>
                               <Trash2 className="h-4 w-4 text-red-600" />
                             </Button>
                           )}
-                          <Button variant="ghost" size="sm" onClick={() => alert('Más opciones disponibles próximamente')}>
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
                         </div>
                       </td>
                     </tr>
@@ -427,6 +471,33 @@ export default function ClientesPage() {
         isOpen={showImportModal}
         onClose={() => setShowImportModal(false)}
         onSuccess={handleModalSuccess}
+      />
+
+      <WhatsAppModal
+        isOpen={showWhatsAppModal}
+        onClose={() => setShowWhatsAppModal(false)}
+        clienteNombre={comunicacionCliente?.nombre}
+        clienteTelefono={comunicacionCliente?.telefono1}
+        mensajePredefinido={(comunicacionCliente?.saldoActual || 0) > 0 
+          ? `Estimado ${comunicacionCliente?.nombre}, le recordamos que tiene un saldo pendiente de $${(comunicacionCliente?.saldoActual || 0).toFixed(2)}. Favor de contactarnos para más información.`
+          : ''
+        }
+      />
+
+      <SMSModal
+        isOpen={showSMSModal}
+        onClose={() => setShowSMSModal(false)}
+        clienteNombre={comunicacionCliente?.nombre}
+        clienteTelefono={comunicacionCliente?.telefono1}
+        mensajePredefinido={(comunicacionCliente?.saldoActual || 0) > 0 
+          ? `Estimado cliente, saldo pendiente: $${(comunicacionCliente?.saldoActual || 0).toFixed(2)}. Contactanos.`
+          : ''
+        }
+      />
+
+      <BulkSMSModal
+        isOpen={showBulkSMSModal}
+        onClose={() => setShowBulkSMSModal(false)}
       />
     </div>
   );

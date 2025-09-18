@@ -102,7 +102,7 @@ export async function GET(request: NextRequest) {
     });
 
     // Mapear datos para compatibilidad
-    const formattedPagos = pagos.map(pago => ({
+    const formattedPagos = pagos.map((pago: any) => ({
       id: pago.id,
       clienteId: pago.clienteId,
       codigoCliente: pago.cliente.codigoCliente,
