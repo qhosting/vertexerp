@@ -13,6 +13,7 @@ declare module "next-auth" {
       lastName?: string | null;
       phone?: string | null;
       sucursal?: string | null;
+      codigo?: string | null;
     };
   }
 
@@ -22,6 +23,7 @@ declare module "next-auth" {
     lastName?: string | null;
     phone?: string | null;
     sucursal?: string | null;
+    codigo?: string | null;
   }
 }
 
@@ -32,5 +34,6 @@ declare module "next-auth/jwt" {
     lastName?: string | null;
     phone?: string | null;
     sucursal?: string | null;
+    codigo?: string | null;
   }
 }

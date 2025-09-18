@@ -1,9 +1,9 @@
 
-import { NextAuthOptions } from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
+import { NextAuthOptions } from 'next-auth';
+import CredentialsProvider from 'next-auth/providers/credentials';
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import { prisma } from "./prisma";
 import bcrypt from "bcryptjs";
-import { prisma } from "./db";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -19,74 +19,62 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        const user = await prisma.user.findUnique({
-          where: {
-            email: credentials.email
+        try {
+          const user = await prisma.user.findUnique({
+            where: {
+              email: credentials.email
+            }
+          });
+
+          if (!user || !user.password) {
+            return null;
           }
-        });
 
-        if (!user || !user.password || !user.isActive) {
+          const isPasswordValid = await bcrypt.compare(
+            credentials.password,
+            user.password
+          );
+
+          if (!isPasswordValid) {
+            return null;
+          }
+
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+            codigo: user.name || 'DQBOT' // Usar nombre como código por ahora
+          };
+        } catch (error) {
+          console.error('Error en autenticación:', error);
           return null;
         }
-
-        const isPasswordValid = await bcrypt.compare(
-          credentials.password,
-          user.password
-        );
-
-        if (!isPasswordValid) {
-          return null;
-        }
-
-        // Update last login
-        await prisma.user.update({
-          where: { id: user.id },
-          data: { lastLogin: new Date() }
-        });
-
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name || `${user.firstName || ''} ${user.lastName || ''}`.trim(),
-          role: user.role,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          phone: user.phone,
-          sucursal: user.sucursal,
-        };
       }
     })
   ],
   session: {
-    strategy: "jwt",
-    maxAge: 24 * 60 * 60, // 24 hours
+    strategy: "jwt"
   },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
         token.role = user.role;
-        token.firstName = user.firstName;
-        token.lastName = user.lastName;
-        token.phone = user.phone;
-        token.sucursal = user.sucursal;
+        token.codigo = user.codigo;
       }
       return token;
     },
     async session({ session, token }) {
-      if (session?.user) {
-        session.user.id = token.sub!;
-        session.user.role = token.role as any;
-        session.user.firstName = token.firstName as string;
-        session.user.lastName = token.lastName as string;
-        session.user.phone = token.phone as string;
-        session.user.sucursal = token.sucursal as string;
+      if (token && token.sub) {
+        session.user.id = token.sub;
+        session.user.role = token.role;
+        session.user.codigo = token.codigo;
       }
       return session;
-    },
+    }
   },
   pages: {
-    signIn: "/login",
-    error: "/login",
-  },
-  secret: process.env.NEXTAUTH_SECRET,
+    signIn: '/auth/signin',
+    error: '/auth/error'
+  }
 };
