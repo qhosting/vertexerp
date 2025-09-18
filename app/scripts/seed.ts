@@ -108,6 +108,129 @@ async function main() {
     });
     console.log('System configuration created/updated');
 
+    // Get gestor and vendedor users for client assignments
+    const gestor = await prisma.user.findFirst({
+      where: { role: 'GESTOR' }
+    });
+    const vendedor = await prisma.user.findFirst({
+      where: { role: 'VENTAS' }
+    });
+
+    // Create sample clients
+    const sampleClients = [
+      {
+        codigoCliente: 'CLI001',
+        nombre: 'Juan Pérez García',
+        telefono1: '442-555-0001',
+        telefono2: '442-555-0002',
+        email: 'juan.perez@email.com',
+        municipio: 'Querétaro',
+        estado: 'Querétaro',
+        colonia: 'Centro',
+        calle: 'Av. Constituyentes',
+        numeroExterior: '123',
+        codigoPostal: '76000',
+        saldoActual: 15000,
+        pagosPeriodicos: 2500,
+        periodicidad: 'SEMANAL',
+        status: 'ACTIVO',
+        diaCobro: 'LUNES',
+        gestorId: gestor?.id,
+        vendedorId: vendedor?.id
+      },
+      {
+        codigoCliente: 'CLI002',
+        nombre: 'María López Hernández',
+        telefono1: '442-555-0003',
+        email: 'maria.lopez@email.com',
+        municipio: 'Querétaro',
+        estado: 'Querétaro',
+        colonia: 'Del Valle',
+        calle: 'Calle 5 de Mayo',
+        numeroExterior: '456',
+        codigoPostal: '76020',
+        saldoActual: 8500,
+        pagosPeriodicos: 1700,
+        periodicidad: 'SEMANAL',
+        status: 'ACTIVO',
+        diaCobro: 'MARTES',
+        gestorId: gestor?.id,
+        vendedorId: vendedor?.id
+      },
+      {
+        codigoCliente: 'CLI003',
+        nombre: 'Carlos Rodríguez Martínez',
+        telefono1: '442-555-0004',
+        telefono2: '442-555-0005',
+        email: 'carlos.rodriguez@email.com',
+        municipio: 'San Juan del Río',
+        estado: 'Querétaro',
+        colonia: 'San Rafael',
+        calle: 'Blvd. Bernardo Quintana',
+        numeroExterior: '789',
+        codigoPostal: '76800',
+        saldoActual: 12000,
+        pagosPeriodicos: 3000,
+        periodicidad: 'QUINCENAL',
+        status: 'MOROSO',
+        diaCobro: 'MIERCOLES',
+        gestorId: gestor?.id,
+        vendedorId: vendedor?.id
+      },
+      {
+        codigoCliente: 'CLI004',
+        nombre: 'Ana Jiménez Torres',
+        telefono1: '442-555-0006',
+        email: 'ana.jimenez@email.com',
+        municipio: 'Corregidora',
+        estado: 'Querétaro',
+        colonia: 'El Pueblito',
+        calle: 'Av. Antea',
+        numeroExterior: '321',
+        codigoPostal: '76900',
+        saldoActual: 5500,
+        pagosPeriodicos: 1100,
+        periodicidad: 'SEMANAL',
+        status: 'ACTIVO',
+        diaCobro: 'JUEVES',
+        gestorId: gestor?.id,
+        vendedorId: vendedor?.id
+      },
+      {
+        codigoCliente: 'CLI005',
+        nombre: 'Roberto Sánchez Morales',
+        telefono1: '442-555-0007',
+        telefono3: '442-555-0008',
+        email: 'roberto.sanchez@email.com',
+        municipio: 'El Marqués',
+        estado: 'Querétaro',
+        colonia: 'Zakia',
+        calle: 'Paseo de la República',
+        numeroExterior: '654',
+        codigoPostal: '76246',
+        saldoActual: 18500,
+        pagosPeriodicos: 3700,
+        periodicidad: 'SEMANAL',
+        status: 'ACTIVO',
+        diaCobro: 'VIERNES',
+        gestorId: gestor?.id,
+        vendedorId: vendedor?.id
+      }
+    ];
+
+    for (const cliente of sampleClients) {
+      try {
+        await prisma.cliente.upsert({
+          where: { codigoCliente: cliente.codigoCliente },
+          update: {},
+          create: cliente,
+        });
+      } catch (error) {
+        console.warn(`Failed to create client ${cliente.codigoCliente}:`, error);
+      }
+    }
+    console.log('Sample clients created/updated');
+
   } catch (error) {
     console.error('Error seeding database:', error);
   }
