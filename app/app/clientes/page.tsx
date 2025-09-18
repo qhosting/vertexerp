@@ -70,7 +70,8 @@ export default function ClientesPage() {
 
   const userRole = session?.user?.role;
   const permissions = userRole ? RolePermissions[userRole] : null;
-  const canWrite = permissions?.clientes?.write === true;
+  const canCreate = permissions?.clientes?.create === true;
+  const canUpdate = permissions?.clientes?.update === true;
   const canDelete = permissions?.clientes?.delete === true;
 
   useEffect(() => {
@@ -260,7 +261,7 @@ export default function ClientesPage() {
         </div>
 
         <div className="flex items-center space-x-2">
-          {canWrite && (
+          {canCreate && (
             <Button onClick={handleNewCliente}>
               <Plus className="mr-2 h-4 w-4" />
               Nuevo Cliente
@@ -421,7 +422,7 @@ export default function ClientesPage() {
                           <Button variant="ghost" size="sm" onClick={() => handleViewCliente(cliente?.id)}>
                             <Eye className="h-4 w-4" />
                           </Button>
-                          {canWrite && (
+                          {canUpdate && (
                             <Button variant="ghost" size="sm" onClick={() => handleEditCliente(cliente?.id)}>
                               <Edit className="h-4 w-4" />
                             </Button>

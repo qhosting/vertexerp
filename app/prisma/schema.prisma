@@ -163,19 +163,63 @@ model Producto {
   categoria     String?
   marca         String?
   modelo        String?
+  codigoBarras  String?
   
-  // Precios y costos
-  precioVenta   Float
-  precioCompra  Float?
-  margen        Float?
+  // Información del producto
+  presentacion  String?
+  contenido     String?
+  peso          Float?
+  dimensiones   String?
+  color         String?
+  talla         String?
+  
+  // Múltiples precios (hasta 5 precios diferentes)
+  precio1       Float    @default(0) // Precio público general
+  precio2       Float    @default(0) // Precio mayorista
+  precio3       Float    @default(0) // Precio distribuidor
+  precio4       Float    @default(0) // Precio especial
+  precio5       Float    @default(0) // Precio promocional
+  
+  // Etiquetas para los precios
+  etiquetaPrecio1 String @default("Público")
+  etiquetaPrecio2 String @default("Mayorista") 
+  etiquetaPrecio3 String @default("Distribuidor")
+  etiquetaPrecio4 String @default("Especial")
+  etiquetaPrecio5 String @default("Promocional")
+  
+  // Costos y márgenes
+  precioCompra  Float    @default(0)
+  porcentajeGanancia Float @default(0)
   
   // Inventario
   stock         Int      @default(0)
   stockMinimo   Int      @default(0)
+  stockMaximo   Int      @default(1000)
   unidadMedida  String   @default("PZA")
+  
+  // Ubicación en almacén
+  pasillo       String?
+  estante       String?
+  nivel         String?
+  
+  // Proveedores
+  proveedorPrincipal String?
+  tiempoEntrega      Int?     @default(0) // Días
+  
+  // Control de calidad
+  fechaVencimiento   DateTime?
+  lote              String?
+  requiereReceta    Boolean  @default(false)
+  controlado        Boolean  @default(false)
+  
+  // Multimedia
+  imagen            String?
+  imagenes          String[] // Array de URLs de imágenes
   
   // Control
   isActive      Boolean  @default(true)
+  destacado     Boolean  @default(false)
+  oferta        Boolean  @default(false)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   

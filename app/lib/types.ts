@@ -62,13 +62,43 @@ export interface Producto {
   categoria?: string | null;
   marca?: string | null;
   modelo?: string | null;
-  precioVenta: number;
-  precioCompra?: number | null;
-  margen?: number | null;
+  codigoBarras?: string | null;
+  presentacion?: string | null;
+  contenido?: string | null;
+  peso?: number | null;
+  dimensiones?: string | null;
+  color?: string | null;
+  talla?: string | null;
+  precio1: number;
+  precio2: number;
+  precio3: number;
+  precio4: number;
+  precio5: number;
+  etiquetaPrecio1: string;
+  etiquetaPrecio2: string;
+  etiquetaPrecio3: string;
+  etiquetaPrecio4: string;
+  etiquetaPrecio5: string;
+  precioCompra: number;
+  porcentajeGanancia: number;
   stock: number;
   stockMinimo: number;
+  stockMaximo: number;
   unidadMedida: string;
+  pasillo?: string | null;
+  estante?: string | null;
+  nivel?: string | null;
+  proveedorPrincipal?: string | null;
+  tiempoEntrega?: number | null;
+  fechaVencimiento?: Date | null;
+  lote?: string | null;
+  requiereReceta: boolean;
+  controlado: boolean;
+  imagen?: string | null;
+  imagenes: string[];
   isActive: boolean;
+  destacado: boolean;
+  oferta: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -122,75 +152,97 @@ export interface DashboardStats {
   ventasMes: number;
   cobrosMes: number;
   productosStock: number;
+  totalProductos: number;
+  productosActivos: number;
+  categorias: number;
+  marcas: number;
+}
+
+export interface ProductFilters {
+  search: string;
+  categoria: string;
+  marca: string;
+  stockStatus: string;
+  priceRange: { min: number; max: number };
+  destacado: boolean;
+  oferta: boolean;
+  activos: boolean;
 }
 
 export interface Permissions {
   [key: string]: {
     read: boolean;
-    write: boolean;
+    create: boolean;
+    update: boolean;
     delete: boolean;
   };
 }
 
 export const RolePermissions: Record<UserRole, Permissions> = {
   SUPERADMIN: {
-    usuarios: { read: true, write: true, delete: true },
-    clientes: { read: true, write: true, delete: true },
-    productos: { read: true, write: true, delete: true },
-    ventas: { read: true, write: true, delete: true },
-    cobranza: { read: true, write: true, delete: true },
-    almacen: { read: true, write: true, delete: true },
-    reportes: { read: true, write: true, delete: false },
-    configuracion: { read: true, write: true, delete: false },
+    dashboard: { read: true, create: false, update: false, delete: false },
+    usuarios: { read: true, create: true, update: true, delete: true },
+    clientes: { read: true, create: true, update: true, delete: true },
+    productos: { read: true, create: true, update: true, delete: true },
+    ventas: { read: true, create: true, update: true, delete: true },
+    cobranza: { read: true, create: true, update: true, delete: true },
+    almacen: { read: true, create: true, update: true, delete: true },
+    reportes: { read: true, create: true, update: true, delete: false },
+    configuracion: { read: true, create: true, update: true, delete: false },
   },
   ADMIN: {
-    usuarios: { read: true, write: true, delete: false },
-    clientes: { read: true, write: true, delete: false },
-    productos: { read: true, write: true, delete: false },
-    ventas: { read: true, write: true, delete: false },
-    cobranza: { read: true, write: true, delete: false },
-    almacen: { read: true, write: true, delete: false },
-    reportes: { read: true, write: true, delete: false },
-    configuracion: { read: true, write: false, delete: false },
+    dashboard: { read: true, create: false, update: false, delete: false },
+    usuarios: { read: true, create: true, update: true, delete: false },
+    clientes: { read: true, create: true, update: true, delete: false },
+    productos: { read: true, create: true, update: true, delete: false },
+    ventas: { read: true, create: true, update: true, delete: false },
+    cobranza: { read: true, create: true, update: true, delete: false },
+    almacen: { read: true, create: true, update: true, delete: false },
+    reportes: { read: true, create: true, update: true, delete: false },
+    configuracion: { read: true, create: false, update: false, delete: false },
   },
   ANALISTA: {
-    usuarios: { read: true, write: false, delete: false },
-    clientes: { read: true, write: false, delete: false },
-    productos: { read: true, write: false, delete: false },
-    ventas: { read: true, write: false, delete: false },
-    cobranza: { read: true, write: false, delete: false },
-    almacen: { read: true, write: false, delete: false },
-    reportes: { read: true, write: true, delete: false },
-    configuracion: { read: true, write: false, delete: false },
+    dashboard: { read: true, create: false, update: false, delete: false },
+    usuarios: { read: true, create: false, update: false, delete: false },
+    clientes: { read: true, create: false, update: false, delete: false },
+    productos: { read: true, create: false, update: false, delete: false },
+    ventas: { read: true, create: false, update: false, delete: false },
+    cobranza: { read: true, create: false, update: false, delete: false },
+    almacen: { read: true, create: false, update: false, delete: false },
+    reportes: { read: true, create: true, update: true, delete: false },
+    configuracion: { read: true, create: false, update: false, delete: false },
   },
   GESTOR: {
-    usuarios: { read: false, write: false, delete: false },
-    clientes: { read: true, write: true, delete: false },
-    productos: { read: true, write: false, delete: false },
-    ventas: { read: true, write: false, delete: false },
-    cobranza: { read: true, write: true, delete: false },
-    almacen: { read: false, write: false, delete: false },
-    reportes: { read: true, write: false, delete: false },
-    configuracion: { read: false, write: false, delete: false },
+    dashboard: { read: true, create: false, update: false, delete: false },
+    usuarios: { read: false, create: false, update: false, delete: false },
+    clientes: { read: true, create: true, update: true, delete: false },
+    productos: { read: true, create: false, update: false, delete: false },
+    ventas: { read: true, create: false, update: false, delete: false },
+    cobranza: { read: true, create: true, update: true, delete: false },
+    almacen: { read: false, create: false, update: false, delete: false },
+    reportes: { read: true, create: false, update: false, delete: false },
+    configuracion: { read: false, create: false, update: false, delete: false },
   },
   VENTAS: {
-    usuarios: { read: false, write: false, delete: false },
-    clientes: { read: true, write: true, delete: false },
-    productos: { read: true, write: false, delete: false },
-    ventas: { read: true, write: true, delete: false },
-    cobranza: { read: true, write: false, delete: false },
-    almacen: { read: true, write: false, delete: false },
-    reportes: { read: true, write: false, delete: false },
-    configuracion: { read: false, write: false, delete: false },
+    dashboard: { read: true, create: false, update: false, delete: false },
+    usuarios: { read: false, create: false, update: false, delete: false },
+    clientes: { read: true, create: true, update: true, delete: false },
+    productos: { read: true, create: false, update: false, delete: false },
+    ventas: { read: true, create: true, update: true, delete: false },
+    cobranza: { read: true, create: false, update: false, delete: false },
+    almacen: { read: true, create: false, update: false, delete: false },
+    reportes: { read: true, create: false, update: false, delete: false },
+    configuracion: { read: false, create: false, update: false, delete: false },
   },
   CLIENTE: {
-    usuarios: { read: false, write: false, delete: false },
-    clientes: { read: false, write: false, delete: false },
-    productos: { read: true, write: false, delete: false },
-    ventas: { read: true, write: false, delete: false },
-    cobranza: { read: true, write: false, delete: false },
-    almacen: { read: false, write: false, delete: false },
-    reportes: { read: false, write: false, delete: false },
-    configuracion: { read: false, write: false, delete: false },
+    dashboard: { read: false, create: false, update: false, delete: false },
+    usuarios: { read: false, create: false, update: false, delete: false },
+    clientes: { read: false, create: false, update: false, delete: false },
+    productos: { read: true, create: false, update: false, delete: false },
+    ventas: { read: true, create: false, update: false, delete: false },
+    cobranza: { read: true, create: false, update: false, delete: false },
+    almacen: { read: false, create: false, update: false, delete: false },
+    reportes: { read: false, create: false, update: false, delete: false },
+    configuracion: { read: false, create: false, update: false, delete: false },
   },
 };
