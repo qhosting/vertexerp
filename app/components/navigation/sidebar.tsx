@@ -28,6 +28,11 @@ import {
   MessageCircle,
   ClipboardList,
   Receipt,
+  FileX,
+  FilePlus,
+  RefreshCw,
+  Shield,
+  AlertTriangle,
 } from 'lucide-react';
 
 interface NavItem {
@@ -74,6 +79,30 @@ const navItems: NavItem[] = [
     href: '/pagares',
     icon: Receipt,
     permission: 'cobranza',
+  },
+  {
+    title: 'Notas de Cargo',
+    href: '/notas-cargo',
+    icon: FilePlus,
+    permission: 'cobranza',
+  },
+  {
+    title: 'Notas de Crédito',
+    href: '/notas-credito',
+    icon: FileX,
+    permission: 'cobranza',
+  },
+  {
+    title: 'Reestructuras',
+    href: '/reestructuras',
+    icon: RefreshCw,
+    permission: 'cobranza',
+  },
+  {
+    title: 'Garantías',
+    href: '/garantias',
+    icon: Shield,
+    permission: 'ventas',
   },
   {
     title: 'Cobranza',
