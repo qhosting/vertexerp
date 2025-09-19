@@ -190,7 +190,7 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-500">Clientes</p>
-                <p className="text-3xl font-bold text-gray-900">{statsBasicas.totalClientes.toLocaleString()}</p>
+                <p className="text-3xl font-bold text-gray-900">{(statsBasicas.totalClientes || 0).toLocaleString()}</p>
               </div>
               <Users className="w-8 h-8 text-blue-500" />
             </div>
@@ -202,7 +202,7 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-500">Productos</p>
-                <p className="text-3xl font-bold text-gray-900">{statsBasicas.totalProductos.toLocaleString()}</p>
+                <p className="text-3xl font-bold text-gray-900">{(statsBasicas.totalProductos || 0).toLocaleString()}</p>
               </div>
               <Package className="w-8 h-8 text-green-500" />
             </div>
@@ -214,7 +214,7 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-500">Ventas Hoy</p>
-                <p className="text-3xl font-bold text-gray-900">${statsBasicas.ventasHoy.toLocaleString()}</p>
+                <p className="text-3xl font-bold text-gray-900">${(statsBasicas.ventasHoy || 0).toLocaleString()}</p>
                 <div className="flex items-center text-xs mt-1">
                   {crecimientoVentas >= 0 ? (
                     <TrendingUp className="w-3 h-3 text-green-500 mr-1" />
@@ -236,7 +236,7 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-500">Cobranza Hoy</p>
-                <p className="text-3xl font-bold text-gray-900">${statsBasicas.cobranzaHoy.toLocaleString()}</p>
+                <p className="text-3xl font-bold text-gray-900">${(statsBasicas.cobranzaHoy || 0).toLocaleString()}</p>
                 <div className="flex items-center text-xs mt-1">
                   {crecimientoCobranza >= 0 ? (
                     <TrendingUp className="w-3 h-3 text-green-500 mr-1" />
@@ -258,8 +258,8 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-500">Saldo Pendiente</p>
-                <p className="text-3xl font-bold text-red-600">${statsBasicas.saldoPendiente.toLocaleString()}</p>
-                <p className="text-xs text-gray-500 mt-1">{statsBasicas.pagaresPendientes} pagarés</p>
+                <p className="text-3xl font-bold text-red-600">${(statsBasicas.saldoPendiente || 0).toLocaleString()}</p>
+                <p className="text-xs text-gray-500 mt-1">{statsBasicas.pagaresPendientes || 0} pagarés</p>
               </div>
               <AlertTriangle className="w-8 h-8 text-red-500" />
             </div>
