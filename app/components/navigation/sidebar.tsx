@@ -26,6 +26,8 @@ import {
   BarChart3,
   Menu,
   MessageCircle,
+  ClipboardList,
+  Receipt,
 } from 'lucide-react';
 
 interface NavItem {
@@ -56,10 +58,22 @@ const navItems: NavItem[] = [
     permission: 'productos',
   },
   {
+    title: 'Pedidos',
+    href: '/pedidos',
+    icon: ClipboardList,
+    permission: 'ventas',
+  },
+  {
     title: 'Ventas',
     href: '/ventas',
     icon: ShoppingCart,
     permission: 'ventas',
+  },
+  {
+    title: 'Pagarés',
+    href: '/pagares',
+    icon: Receipt,
+    permission: 'cobranza',
   },
   {
     title: 'Cobranza',

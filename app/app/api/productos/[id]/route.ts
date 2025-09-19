@@ -27,7 +27,7 @@ export async function GET(
       include: {
         _count: {
           select: {
-            ventaItems: true,
+            detallesVenta: true,
             movimientos: true,
           },
         },
@@ -169,7 +169,7 @@ export async function DELETE(
     const producto = await prisma.producto.findUnique({
       where: { id: params.id },
       include: {
-        ventaItems: true,
+        detallesVenta: true,
         compraItems: true,
       },
     });
@@ -179,7 +179,7 @@ export async function DELETE(
     }
 
     // Verificar si el producto tiene transacciones asociadas
-    if (producto.ventaItems.length > 0 || producto.compraItems.length > 0) {
+    if (producto.detallesVenta.length > 0 || producto.compraItems.length > 0) {
       // En lugar de eliminar, desactivar
       await prisma.producto.update({
         where: { id: params.id },

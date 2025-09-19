@@ -58,11 +58,24 @@ model User {
   accounts Account[]
   sessions Session[]
   
-  // Relaciones con módulos
+  // Relaciones con módulos existentes
   ventasCreadas Venta[] @relation("VentaCreador")
   pagosGestionados Pago[] @relation("PagoGestor")
   clientesAsignados Cliente[] @relation("ClienteGestor")
   auditLogs AuditLog[]
+  
+  // Nuevas relaciones - Módulo de Pedidos
+  pedidosCreados Pedido[] @relation("PedidoVendedor")
+  
+  // Nuevas relaciones - Notas de Cargo y Crédito
+  notasCargoAplicadas NotaCargo[] @relation("NotaCargoAplicadaPor")
+  notasCreditoAplicadas NotaCredito[] @relation("NotaCreditoAplicadaPor")
+  
+  // Nuevas relaciones - Reestructuras
+  reestructurasAutorizadas ReestructuraCredito[] @relation("ReestructuraAutorizada")
+  
+  // Nuevas relaciones - Garantías
+  garantiasAtendidas Garantia[] @relation("GarantiaAtendida")
 }
 
 model VerificationToken {
@@ -146,11 +159,22 @@ model Cliente {
   fechaAlta         DateTime  @default(now()) // fecha_alta
   ultimaActualizacion DateTime @default(now()) @updatedAt // fechau_cliente
   
-  // Relaciones
+  // Relaciones existentes
   gestor            User?     @relation("ClienteGestor", fields: [gestorId], references: [id])
   ventas            Venta[]
   pagos             Pago[]
   creditoHistorial  CreditoHistorial[]
+  
+  // Nuevas relaciones - Pedidos
+  pedidos           Pedido[]
+  
+  // Nuevas relaciones - Notas
+  notasCargo        NotaCargo[]
+  notasCredito      NotaCredito[]
+  
+  // Nuevas relaciones - Reestructuras y Garantías
+  reestructuras     ReestructuraCredito[]
+  garantias         Garantia[]
   
   @@map("clientes")
 }
@@ -223,10 +247,20 @@ model Producto {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   
-  // Relaciones
-  ventaItems    VentaItem[]
+  // Relaciones existentes
   compraItems   CompraItem[]
   movimientos   MovimientoInventario[]
+  
+  // Nuevas relaciones - Pedidos y Ventas
+  detallesPedido DetallePedido[]
+  detallesVenta  DetalleVenta[]
+  
+  // Nuevas relaciones - Notas de Crédito
+  detallesNotaCredito DetalleNotaCredito[]
+  
+  // Nuevas relaciones - Garantías
+  garantias     Garantia[]
+  garantiasReemplazo Garantia[] @relation("ProductoReemplazoGarantia")
   
   @@map("productos")
 }
@@ -253,13 +287,74 @@ model Proveedor {
   @@map("proveedores")
 }
 
-// ============= MÓDULO DE VENTAS =============
+// ============= MÓDULO DE PEDIDOS =============
+
+model Pedido {
+  id              String          @id @default(cuid())
+  folio           String          @unique
+  clienteId       String
+  vendedorId      String
+  
+  // Datos financieros
+  subtotal        Float
+  iva             Float           @default(0)
+  descuento       Float           @default(0)
+  total           Float
+  
+  // Control
+  estatus         StatusPedido    @default(PENDIENTE)
+  prioridad       PrioridadPedido @default(NORMAL)
+  observaciones   String?
+  
+  // Fechas
+  fechaPedido     DateTime        @default(now())
+  fechaEntregaEstimada DateTime?
+  fechaVencimiento DateTime?
+  
+  // Control interno
+  convertidoAVenta Boolean        @default(false)
+  ventaId         String?         @unique
+  motivoCancelacion String?
+  
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  
+  // Relaciones
+  cliente         Cliente         @relation(fields: [clienteId], references: [id])
+  vendedor        User            @relation("PedidoVendedor", fields: [vendedorId], references: [id])
+  detalles        DetallePedido[]
+  venta           Venta?          @relation("PedidoToVenta", fields: [ventaId], references: [id])
+  
+  @@map("pedidos")
+}
+
+model DetallePedido {
+  id              String   @id @default(cuid())
+  pedidoId        String
+  productoId      String
+  cantidad        Float
+  precioUnitario  Float
+  descuento       Float    @default(0)
+  subtotal        Float
+  observaciones   String?
+  
+  pedido          Pedido   @relation(fields: [pedidoId], references: [id], onDelete: Cascade)
+  producto        Producto @relation(fields: [productoId], references: [id])
+  
+  @@map("detalle_pedidos")
+}
+
+// ============= MÓDULO DE VENTAS (FACTURAS) =============
 
 model Venta {
   id                String      @id @default(cuid())
-  numeroVenta       String      @unique
+  folio             String      @unique @default(cuid())
+  numeroFactura     String?     @unique // Número oficial de factura
   clienteId         String
   vendedorId        String
+  
+  // Origen del pedido (si aplica)
+  pedidoId          String?     @unique
   
   // Datos financieros
   subtotal          Float
@@ -267,45 +362,292 @@ model Venta {
   descuento         Float       @default(0)
   total             Float
   
-  // Control de pagos
-  anticipo          Float       @default(0)
-  saldo             Float
+  // Sistema de pagarés/abonos
+  pagoInicial       Float       @default(0)    // Enganche/anticipo
+  saldoPendiente    Float       @default(0)    // Calculado: total - pagoInicial
   periodicidadPago  Periodicidad @default(SEMANAL)
-  numeroPagos       Int
-  montoPago         Float
+  montoPago         Float       @default(0)    // Monto de cada abono/pago
+  numeroPagos       Int         @default(1)    // Calculado automáticamente
   
-  // Status y fechas
+  // Fechas del sistema de crédito
+  fechaProximoPago  DateTime?
+  diasGracia        Int         @default(0)
+  
+  // Status y control
   status            StatusVenta @default(PENDIENTE)
   fechaVenta        DateTime    @default(now())
   fechaVencimiento  DateTime?
   
+  // Control de inventario
+  inventarioAfectado Boolean    @default(false)
+  fechaAfectacionInventario DateTime?
+  
   // Metadatos
   observaciones     String?
+  notasInternas     String?
   createdAt         DateTime    @default(now())
   updatedAt         DateTime    @updatedAt
   
   // Relaciones
   cliente           Cliente     @relation(fields: [clienteId], references: [id])
   vendedor          User        @relation("VentaCreador", fields: [vendedorId], references: [id])
-  items             VentaItem[]
+  pedidoOrigen      Pedido?     @relation("PedidoToVenta")
+  detalles          DetalleVenta[]
+  pagares           Pagare[]
   pagos             Pago[]
+  notasCargo        NotaCargo[]
+  notasCredito      NotaCredito[]
+  reestructuras     ReestructuraCredito[]
+  garantias         Garantia[]
   
   @@map("ventas")
 }
 
-model VentaItem {
-  id          String   @id @default(cuid())
-  ventaId     String
-  productoId  String
-  cantidad    Int
-  precioUnitario Float
-  descuento   Float    @default(0)
-  subtotal    Float
+model DetalleVenta {
+  id              String   @id @default(cuid())
+  ventaId         String
+  productoId      String
+  cantidad        Float
+  precioUnitario  Float
+  descuento       Float    @default(0)
+  subtotal        Float
   
-  venta       Venta    @relation(fields: [ventaId], references: [id], onDelete: Cascade)
-  producto    Producto @relation(fields: [productoId], references: [id])
+  // Control de garantía
+  tiempoGarantia  Int?     // Meses de garantía
+  observaciones   String?
   
-  @@map("venta_items")
+  venta           Venta    @relation(fields: [ventaId], references: [id], onDelete: Cascade)
+  producto        Producto @relation(fields: [productoId], references: [id])
+  
+  @@map("detalle_ventas")
+}
+
+// ============= SISTEMA DE PAGARÉS =============
+
+model Pagare {
+  id                String     @id @default(cuid())
+  ventaId           String
+  numeroPago        Int        // 1, 2, 3, etc.
+  monto             Float
+  fechaVencimiento  DateTime
+  
+  // Estado del pagaré
+  estatus           StatusPagare @default(PENDIENTE)
+  fechaPago         DateTime?
+  montoPagado       Float        @default(0)
+  
+  // Intereses y moras
+  diasVencido       Int          @default(0)
+  tasaInteresMora   Float        @default(0) // Porcentaje diario
+  interesesMora     Float        @default(0)
+  interesesPagados  Float        @default(0)
+  
+  // Control
+  observaciones     String?
+  calculadoAlCorte  DateTime?    // Última fecha de cálculo de intereses
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+  
+  // Relaciones
+  venta             Venta        @relation(fields: [ventaId], references: [id])
+  detallesPago      DetallePagoPagare[]
+  
+  @@map("pagares")
+}
+
+model DetallePagoPagare {
+  id              String   @id @default(cuid())
+  pagareId        String
+  pagoId          String
+  montoAplicado   Float
+  aplicadoCapital Float
+  aplicadoInteres Float
+  fechaAplicacion DateTime @default(now())
+  
+  pagare          Pagare   @relation(fields: [pagareId], references: [id])
+  pago            Pago     @relation(fields: [pagoId], references: [id])
+  
+  @@map("detalle_pago_pagares")
+}
+
+// ============= NOTAS DE CARGO Y CRÉDITO =============
+
+model NotaCargo {
+  id              String   @id @default(cuid())
+  folio           String   @unique
+  clienteId       String
+  ventaId         String?
+  
+  // Datos de la nota
+  concepto        ConceptoNotaCargo
+  descripcion     String
+  monto           Float
+  referencia      String?
+  
+  // Control de aplicación
+  aplicada        Boolean  @default(false)
+  fechaAplicacion DateTime?
+  aplicadaPorId   String?
+  
+  // Fechas
+  fecha           DateTime @default(now())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relaciones
+  cliente         Cliente  @relation(fields: [clienteId], references: [id])
+  venta           Venta?   @relation(fields: [ventaId], references: [id])
+  aplicadaPor     User?    @relation("NotaCargoAplicadaPor", fields: [aplicadaPorId], references: [id])
+  
+  @@map("notas_cargo")
+}
+
+model NotaCredito {
+  id              String   @id @default(cuid())
+  folio           String   @unique
+  clienteId       String
+  ventaId         String?
+  
+  // Datos de la nota
+  concepto        ConceptoNotaCredito
+  descripcion     String
+  monto           Float
+  referencia      String?
+  
+  // Control de inventario (para devoluciones)
+  afectaInventario Boolean  @default(false)
+  inventarioAfectado Boolean @default(false)
+  
+  // Control de aplicación
+  aplicada        Boolean  @default(false)
+  fechaAplicacion DateTime?
+  aplicadaPorId   String?
+  
+  // Fechas
+  fecha           DateTime @default(now())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relaciones
+  cliente         Cliente  @relation(fields: [clienteId], references: [id])
+  venta           Venta?   @relation(fields: [ventaId], references: [id])
+  aplicadaPor     User?    @relation("NotaCreditoAplicadaPor", fields: [aplicadaPorId], references: [id])
+  detalles        DetalleNotaCredito[]
+  
+  @@map("notas_credito")
+}
+
+model DetalleNotaCredito {
+  id              String      @id @default(cuid())
+  notaCreditoId   String
+  productoId      String?
+  cantidad        Float?
+  precioUnitario  Float?
+  subtotal        Float
+  motivo          String
+  
+  notaCredito     NotaCredito @relation(fields: [notaCreditoId], references: [id], onDelete: Cascade)
+  producto        Producto?   @relation(fields: [productoId], references: [id])
+  
+  @@map("detalle_notas_credito")
+}
+
+// ============= REESTRUCTURAS DE CRÉDITO =============
+
+model ReestructuraCredito {
+  id                      String   @id @default(cuid())
+  ventaId                 String
+  clienteId               String
+  
+  // Condiciones anteriores
+  saldoAnterior           Float
+  periodicidadAnterior    Periodicidad
+  montoPagoAnterior       Float
+  numeroPagosAnterior     Int
+  fechaProximoPagoAnterior DateTime?
+  
+  // Nuevas condiciones
+  saldoNuevo              Float
+  periodicidadNueva       Periodicidad
+  montoPagoNuevo          Float
+  numeroPagosNuevo        Int
+  fechaProximoPagoNueva   DateTime
+  
+  // Motivo y autorización
+  motivo                  MotivoReestructura
+  observaciones           String?
+  descuentoOtorgado       Float    @default(0)
+  interesesCondonados     Float    @default(0)
+  
+  // Control
+  autorizadaPorId         String
+  fechaReestructura       DateTime @default(now())
+  activa                  Boolean  @default(true)
+  
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+  
+  // Relaciones
+  venta                   Venta    @relation(fields: [ventaId], references: [id])
+  cliente                 Cliente  @relation(fields: [clienteId], references: [id])
+  autorizadaPor           User     @relation("ReestructuraAutorizada", fields: [autorizadaPorId], references: [id])
+  
+  @@map("reestructuras_credito")
+}
+
+// ============= GARANTÍAS DE PRODUCTOS =============
+
+model Garantia {
+  id                    String   @id @default(cuid())
+  folio                 String   @unique
+  clienteId             String
+  ventaId               String
+  productoId            String
+  
+  // Información de la garantía
+  tipoGarantia          TipoGarantia
+  fechaCompra           DateTime
+  fechaInicioGarantia   DateTime
+  fechaFinGarantia      DateTime
+  mesesGarantia         Int
+  
+  // Estado de la garantía
+  estatus               StatusGarantia @default(ACTIVA)
+  
+  // Detalles del reclamo (si aplica)
+  fechaReclamo          DateTime?
+  descripcionFalla      String?
+  diagnostico           String?
+  solucionAplicada      String?
+  
+  // Control de reemplazo/reparación
+  requiereReemplazo     Boolean  @default(false)
+  productoReemplazoId   String?
+  costoReparacion       Float?
+  costoReemplazo        Float?
+  
+  // Control de inventario
+  afectaInventario      Boolean  @default(false)
+  inventarioAfectado    Boolean  @default(false)
+  
+  // Personal técnico
+  atendidaPorId         String?
+  
+  // Fechas de seguimiento
+  fechaRecepcion        DateTime?
+  fechaEntrega          DateTime?
+  
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  
+  // Relaciones
+  cliente               Cliente  @relation(fields: [clienteId], references: [id])
+  venta                 Venta    @relation(fields: [ventaId], references: [id])
+  producto              Producto @relation(fields: [productoId], references: [id])
+  productoReemplazo     Producto? @relation("ProductoReemplazoGarantia", fields: [productoReemplazoId], references: [id])
+  atendidaPor           User?    @relation("GarantiaAtendida", fields: [atendidaPorId], references: [id])
+  
+  @@map("garantias")
 }
 
 // ============= MÓDULO DE PAGOS Y COBRANZA =============
@@ -318,8 +660,13 @@ model Pago {
   
   // Datos del pago
   referencia        String       // ref_pago
+  folio             String?      @unique // Folio interno del pago
   monto             Float        // montop
   tipoPago          TipoPago     @default(EFECTIVO) // tipopag
+  
+  // Conceptos del pago
+  aplicadoCapital   Float        @default(0) // Monto aplicado a capital
+  aplicadoInteres   Float        @default(0) // Monto aplicado a intereses
   
   // Fechas
   fechaPago         DateTime     @default(now()) // fechap
@@ -335,10 +682,15 @@ model Pago {
   sincronizado      Boolean      @default(false) // descargado
   deviceImei        String?      // imei
   
+  // Observaciones
+  observaciones     String?
+  concepto          String?      // Concepto del pago (abono, intereses, etc.)
+  
   // Relaciones
   cliente           Cliente      @relation(fields: [clienteId], references: [id])
   venta             Venta?       @relation(fields: [ventaId], references: [id])
   gestor            User?        @relation("PagoGestor", fields: [gestorId], references: [id])
+  detallesPagares   DetallePagoPagare[]
   
   @@map("pagos")
 }
@@ -513,4 +865,73 @@ enum TipoMovimiento {
   SALIDA
   AJUSTE
   TRANSFERENCIA
+}
+
+// ============= NUEVOS ENUMS - FASE 1 =============
+
+enum StatusPedido {
+  PENDIENTE
+  APROBADO
+  RECHAZADO
+  CONVERTIDO_VENTA
+  CANCELADO
+}
+
+enum PrioridadPedido {
+  BAJA
+  NORMAL
+  ALTA
+  URGENTE
+}
+
+enum StatusPagare {
+  PENDIENTE
+  PARCIAL
+  PAGADO
+  VENCIDO
+  CANCELADO
+}
+
+enum ConceptoNotaCargo {
+  INTERESES_MORA
+  GASTOS_COBRANZA
+  GASTOS_ADMINISTRATIVOS
+  COMISION_SERVICIOS
+  PENALIZACION
+  OTROS
+}
+
+enum ConceptoNotaCredito {
+  DEVOLUCION_MERCANCIA
+  DESCUENTO_COMERCIAL
+  AJUSTE_PRECIO
+  COMPENSACION
+  GARANTIA
+  OTROS
+}
+
+enum MotivoReestructura {
+  DIFICULTADES_ECONOMICAS
+  PERDIDA_EMPLEO
+  ENFERMEDAD
+  DESASTRE_NATURAL
+  ACUERDO_COMERCIAL
+  RETENCION_CLIENTE
+  OTROS
+}
+
+enum TipoGarantia {
+  FABRICANTE
+  TIENDA
+  EXTENDIDA
+  SEGURO
+}
+
+enum StatusGarantia {
+  ACTIVA
+  RECLAMADA
+  EN_PROCESO
+  RESUELTA
+  VENCIDA
+  CANCELADA
 }
