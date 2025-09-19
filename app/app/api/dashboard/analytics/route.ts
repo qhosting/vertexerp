@@ -167,47 +167,56 @@ export async function GET(request: NextRequest) {
 
     // Tendencias de inventario
     const inventarioTendencias = await prisma.$queryRaw`
-      SELECT 
-        p."codigo",
-        p."nombre",
-        p."stock",
-        p."stockMinimo",
-        p."stockMaximo",
-        CASE 
-          WHEN p."stock" <= p."stockMinimo" THEN 'critico'
-          WHEN p."stock" <= p."stockMinimo" * 1.5 THEN 'bajo'
-          WHEN p."stock" >= p."stockMaximo" * 0.8 THEN 'alto'
-          ELSE 'normal'
-        END as nivel_stock,
-        COUNT(mi."id") as movimientos_recientes
-      FROM "productos" p
-      LEFT JOIN "movimientos_inventario" mi ON mi."productoId" = p."id" 
-        AND mi."fechaMovimiento" >= ${subMonths(fechaFin, 1)}
-      WHERE p."isActive" = true
-      GROUP BY p."id", p."codigo", p."nombre", p."stock", p."stockMinimo", p."stockMaximo"
+      SELECT * FROM (
+        SELECT 
+          p."codigo",
+          p."nombre",
+          p."stock",
+          p."stockMinimo",
+          p."stockMaximo",
+          CASE 
+            WHEN p."stock" <= p."stockMinimo" THEN 'critico'
+            WHEN p."stock" <= p."stockMinimo" * 1.5 THEN 'bajo'
+            WHEN p."stock" >= p."stockMaximo" * 0.8 THEN 'alto'
+            ELSE 'normal'
+          END as nivel_stock,
+          COUNT(mi."id") as movimientos_recientes
+        FROM "productos" p
+        LEFT JOIN "movimientos_inventario" mi ON mi."productoId" = p."id" 
+          AND mi."fechaMovimiento" >= ${subMonths(fechaFin, 1)}
+        WHERE p."isActive" = true
+        GROUP BY p."id", p."codigo", p."nombre", p."stock", p."stockMinimo", p."stockMaximo"
+      ) inventario
       ORDER BY 
-        CASE nivel_stock
+        CASE inventario.nivel_stock
           WHEN 'critico' THEN 1
           WHEN 'bajo' THEN 2
           WHEN 'alto' THEN 3
           ELSE 4
         END,
-        movimientos_recientes DESC
+        inventario.movimientos_recientes DESC
       LIMIT 20
     `;
+
+    // Convertir BigInt a Number para serialización JSON
+    const convertBigIntToNumber = (obj: any) => {
+      return JSON.parse(JSON.stringify(obj, (key, value) =>
+        typeof value === 'bigint' ? Number(value) : value
+      ));
+    };
 
     return NextResponse.json({
       periodo: parseInt(periodo),
       fechaInicio,
       fechaFin,
-      ventasPorMes: ventasPorMes || [],
-      cobranzaPorMes: cobranzaPorMes || [],
-      topProductos: topProductos || [],
-      topClientes: topClientes || [],
-      carteraVencida: carteraVencida || [],
-      garantiasAnalysis: garantiasAnalysis || [],
-      reestructurasAnalysis: reestructurasAnalysis || [],
-      inventarioTendencias: inventarioTendencias || [],
+      ventasPorMes: convertBigIntToNumber(ventasPorMes || []),
+      cobranzaPorMes: convertBigIntToNumber(cobranzaPorMes || []),
+      topProductos: convertBigIntToNumber(topProductos || []),
+      topClientes: convertBigIntToNumber(topClientes || []),
+      carteraVencida: convertBigIntToNumber(carteraVencida || []),
+      garantiasAnalysis: convertBigIntToNumber(garantiasAnalysis || []),
+      reestructurasAnalysis: convertBigIntToNumber(reestructurasAnalysis || []),
+      inventarioTendencias: convertBigIntToNumber(inventarioTendencias || []),
     });
   } catch (error) {
     console.error('Error al obtener analytics:', error);
