@@ -1,7 +1,8 @@
 
+
 # ===========================================
 # Dockerfile Multi-Stage para Next.js
-# Sistema ERP Completo v4.0
+# VertexERP v4.0
 # ===========================================
 
 # Stage 1: Dependencias
@@ -11,11 +12,14 @@ RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
 
 # Copiar archivos de dependencias
-COPY app/package.json app/yarn.lock* app/.yarnrc.yml* ./
+COPY app/package.json app/yarn.lock ./
+
+# Copiar configuración de Yarn
+COPY app/.yarnrc.yml ./
 COPY app/.yarn ./.yarn
 
-# Instalar dependencias
-RUN yarn install --frozen-lockfile
+# Instalar dependencias con versiones exactas
+RUN yarn install --immutable --network-timeout 300000
 
 # Stage 2: Builder
 FROM node:18-alpine AS builder
@@ -32,7 +36,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 
 # Generar Prisma Client
-RUN npx prisma generate
+RUN yarn prisma generate
 
 # Build de Next.js en modo standalone
 RUN yarn build
