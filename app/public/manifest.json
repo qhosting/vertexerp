@@ -1,8 +1,8 @@
 
 {
-  "name": "Sistema ERP - Cobranza Móvil",
-  "short_name": "ERP Cobranza",
-  "description": "Sistema de cobranza móvil con funcionalidad offline",
+  "name": "VertexERP - Sistema de Gestión Empresarial",
+  "short_name": "VertexERP",
+  "description": "VertexERP: Sistema integral de gestión empresarial con funcionalidad offline",
   "start_url": "/cobranza",
   "display": "standalone",
   "background_color": "#ffffff",

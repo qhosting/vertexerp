@@ -1,4 +1,4 @@
-# 🚀 Sistema ERP - Listo para Deployment
+# 🚀 VertexERP - Listo para Deployment
 
 **Fecha:** 24 de Octubre de 2025  
 **Versión:** v4.0.0  

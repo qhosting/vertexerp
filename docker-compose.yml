@@ -2,12 +2,12 @@
 version: '3.8'
 
 services:
-  # Aplicación Next.js
+  # VertexERP - Aplicación Next.js
   app:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: sistema-erp-app
+    container_name: vertexerp-app
     restart: unless-stopped
     ports:
       - "3000:3000"
@@ -20,7 +20,7 @@ services:
     depends_on:
       - db
     networks:
-      - erp-network
+      - vertexvertexerp-network
     volumes:
       - uploads:/app/uploads
     healthcheck:
@@ -33,7 +33,7 @@ services:
   # Base de datos PostgreSQL
   db:
     image: postgres:15-alpine
-    container_name: sistema-erp-db
+    container_name: vertexerp-db
     restart: unless-stopped
     ports:
       - "5432:5432"
@@ -44,7 +44,7 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
     networks:
-      - erp-network
+      - vertexerp-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-erp_user}"]
       interval: 10s
@@ -64,12 +64,12 @@ services:
     volumes:
       - pgadmin-data:/var/lib/pgadmin
     networks:
-      - erp-network
+      - vertexerp-network
     profiles:
       - dev
 
 networks:
-  erp-network:
+  vertexerp-network:
     driver: bridge
 
 volumes:

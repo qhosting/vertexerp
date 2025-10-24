@@ -1,7 +1,7 @@
 
-# 🚀 Guía de Instalación - Sistema ERP Completo v4.0
+# 🚀 Guía de Instalación - VertexERP Completo v4.0
 
-Esta guía te ayudará a instalar y configurar el Sistema ERP Completo en tu entorno local o de producción.
+Esta guía te ayudará a instalar y configurar el VertexERP Completo en tu entorno local o de producción.
 
 ## 📋 Prerrequisitos
 
@@ -215,9 +215,9 @@ El sistema incluye funcionalidad PWA lista para usar:
 2. **Personalizar manifest.json**
 ```json
 {
-  "name": "Tu Sistema ERP",
+  "name": "Tu VertexERP",
   "short_name": "ERP",
-  "description": "Sistema ERP Completo para tu empresa",
+  "description": "VertexERP Completo para tu empresa",
   "start_url": "/",
   "display": "standalone"
 }
@@ -358,6 +358,6 @@ Después de una instalación exitosa:
 
 ---
 
-**¡Felicidades! Tu Sistema ERP está listo para usar** 🎉
+**¡Felicidades! Tu VertexERP está listo para usar** 🎉
 
 Desarrollado con ❤️ usando DeepAgent de Abacus.AI 🚀

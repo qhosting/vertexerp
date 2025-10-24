@@ -1,5 +1,5 @@
 
-# ⚡ Quick Start - Sistema ERP Completo v4.0
+# ⚡ Quick Start - VertexERP Completo v4.0
 
 ## 🚀 Instalación Ultra Rápida (5 minutos)
 
@@ -72,4 +72,4 @@ Contraseña: admin123
 
 ---
 
-**¡Tu Sistema ERP está listo en minutos!** 🎉
+**¡Tu VertexERP está listo en minutos!** 🎉

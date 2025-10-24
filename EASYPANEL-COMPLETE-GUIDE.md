@@ -1,7 +1,7 @@
 
 # 🚀 Guía Completa de Deployment en Easypanel
 
-**Sistema ERP Completo v4.0**  
+**VertexERP Completo v4.0**  
 Última actualización: Octubre 2025
 
 ---
@@ -25,7 +25,7 @@
 
 ## 🎯 Introducción
 
-Esta guía te ayudará a desplegar el Sistema ERP Completo en **Easypanel**, una plataforma de hosting moderna que simplifica el deployment de aplicaciones Docker.
+Esta guía te ayudará a desplegar el VertexERP Completo en **Easypanel**, una plataforma de hosting moderna que simplifica el deployment de aplicaciones Docker.
 
 ### ¿Qué incluye este deployment?
 
@@ -43,7 +43,7 @@ Esta guía te ayudará a desplegar el Sistema ERP Completo en **Easypanel**, una
 ┌─────────────────────────────────────────┐
 │          Easypanel Platform             │
 │  ┌───────────────────────────────────┐  │
-│  │     Sistema ERP App (Next.js)     │  │
+│  │     VertexERP App (Next.js)     │  │
 │  │        Docker Container           │  │
 │  │           Port: 3000              │  │
 │  └───────────┬───────────────────────┘  │
@@ -141,12 +141,12 @@ https://TU_IP_DEL_VPS:3000
 **2.1. Crear nuevo proyecto:**
 - Click en "Create Project"
 - Nombre: `sistema-erp-completo`
-- Descripción: `Sistema ERP Completo v4.0`
+- Descripción: `VertexERP Completo v4.0`
 
 **2.2. Configuración del proyecto:**
 ```yaml
 Name: sistema-erp-completo
-Description: Sistema ERP Completo para gestión empresarial
+Description: VertexERP Completo para gestión empresarial
 Environment: production
 ```
 
@@ -650,7 +650,7 @@ CPU: 2 cores (desarrollo), 4 cores (producción)
 
 ## 🔄 Actualizaciones
 
-### Actualizar el Sistema ERP
+### Actualizar el VertexERP
 
 **Método 1: Auto-Deploy (Recomendado)**
 
@@ -833,7 +833,7 @@ Total:                     ~$313/mes
 - **GitHub Issues:** https://github.com/qhosting/sistema-erp-completo/issues
 - **Email Soporte:** contacto@tuempresa.com
 
-### Soporte del Sistema ERP
+### Soporte del VertexERP
 
 Para problemas específicos del código:
 1. Revisa la documentación en el repositorio
@@ -874,7 +874,7 @@ Antes de considerar el deployment completo:
 
 ## 🎉 ¡Deployment Exitoso!
 
-Si has seguido todos los pasos, tu Sistema ERP Completo v4.0 debería estar:
+Si has seguido todos los pasos, tu VertexERP Completo v4.0 debería estar:
 
 ✅ Corriendo en producción  
 ✅ Accesible vía HTTPS  
@@ -890,5 +890,5 @@ Si has seguido todos los pasos, tu Sistema ERP Completo v4.0 debería estar:
 
 **Última actualización:** Octubre 2025  
 **Versión de la guía:** 1.0  
-**Autor:** Sistema ERP Team
+**Autor:** VertexERP Team
 

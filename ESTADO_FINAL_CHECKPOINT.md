@@ -266,7 +266,7 @@ sistema_erp_completo/
 
 ---
 
-## 🎯 Sistema ERP - Características Principales
+## 🎯 VertexERP - Características Principales
 
 ### Módulos Implementados:
 

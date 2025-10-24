@@ -1,9 +1,9 @@
 
-# 🏢 Sistema ERP Completo v4.0
+# 🏢 VertexERP v4.0
 
 ## Descripción del Proyecto
 
-Sistema ERP (Enterprise Resource Planning) completo desarrollado con **Next.js 14**, **TypeScript**, **Prisma**, **PostgreSQL** y **Tailwind CSS**. Diseñado específicamente para empresas que manejan ventas a crédito, cobranza, inventario y gestión integral de clientes.
+**VertexERP** es un Sistema ERP (Enterprise Resource Planning) completo desarrollado con **Next.js 14**, **TypeScript**, **Prisma**, **PostgreSQL** y **Tailwind CSS**. Diseñado específicamente para empresas que manejan ventas a crédito, cobranza, inventario y gestión integral de clientes.
 
 ## 🎯 Características Principales
 
