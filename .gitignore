@@ -21,8 +21,3 @@ out
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-
-# Yarn backup - IMPORTANTE: NO ignorar .yarn-backup/yarn.lock.master
-# Este archivo es crítico para el build de Docker
-!.yarn-backup/
-!.yarn-backup/yarn.lock.master
