@@ -11,6 +11,7 @@ coverage
 # Next.js
 .next/
 out/
+.build/
 
 # Production
 build
@@ -26,53 +27,35 @@ yarn-debug.log*
 yarn-error.log*
 
 # Local env files
-.env
 .env*.local
 .env.development
-.env.test
 
 # Vercel
 .vercel
 
 # TypeScript
 *.tsbuildinfo
-tsconfig.tsbuildinfo
 
-# Git
-.git
-.gitignore
-.gitattributes
-
-# IDE
+# IDEs
 .vscode
 .idea
 *.swp
 *.swo
-*~
-
-# Documentation
-*.md
-!README.md
-docs/
-*.pdf
-
-# Docker
-Dockerfile
-docker-compose.yml
-.dockerignore
-
-# Uploads y archivos temporales
-uploads/
-temp/
-tmp/
-
-# Logs
-logs
-*.log
 
 # OS
 .DS_Store
 Thumbs.db
 
-# Prisma
-prisma/migrations/
+# Git
+.git
+.gitignore
+
+# Documentación (no necesaria en build)
+*.md
+*.pdf
+*.txt
+docs/
+
+# Archivos de configuración locales
+.yarnrc.yml
+.yarn/
