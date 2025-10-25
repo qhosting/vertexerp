@@ -14,12 +14,10 @@ WORKDIR /app
 # Copiar archivos de dependencias
 COPY app/package.json app/yarn.lock ./
 
-# Copiar configuración de Yarn
-COPY app/.yarnrc.yml ./
-COPY app/.yarn ./.yarn
-
 # Instalar dependencias con versiones exactas
-RUN yarn install --immutable --network-timeout 300000
+# Nota: No copiamos .yarnrc.yml ni .yarn porque contienen configuraciones 
+# locales que no son necesarias en el contenedor
+RUN yarn install --frozen-lockfile --network-timeout 300000 --production=false
 
 # Stage 2: Builder
 FROM node:18-alpine AS builder
