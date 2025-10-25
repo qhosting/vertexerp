@@ -20,7 +20,7 @@ services:
     depends_on:
       - db
     networks:
-      - vertexvertexerp-network
+      - vertexerp-network
     volumes:
       - uploads:/app/uploads
     healthcheck:
