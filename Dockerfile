@@ -7,16 +7,29 @@
 
 # Stage 1: Dependencias
 FROM node:18-alpine AS deps
-RUN apk add --no-cache libc6-compat openssl
+RUN apk add --no-cache libc6-compat openssl bash
 
 WORKDIR /app
 
-# Copiar archivos de dependencias
-COPY app/package.json app/yarn.lock ./
+# Copiar archivos de dependencias y backup de yarn.lock
+COPY app/package.json ./
+COPY .yarn-backup/yarn.lock.master ./yarn.lock.backup
+
+# Intentar copiar yarn.lock del directorio app (si existe y es válido)
+COPY app/yarn.lock* ./
+
+# Script para asegurar que yarn.lock existe y es válido
+# Si yarn.lock no existe o es un symlink, usar el backup
+RUN if [ ! -f yarn.lock ] || [ -L yarn.lock ]; then \
+        echo "⚠️  yarn.lock no válido, usando backup master..."; \
+        cp yarn.lock.backup yarn.lock; \
+    fi && \
+    echo "✅ yarn.lock verificado como archivo real:" && \
+    ls -lh yarn.lock && \
+    echo "Total de líneas: $(wc -l < yarn.lock)"
 
 # Instalar dependencias con versiones exactas
-# Nota: No copiamos .yarnrc.yml ni .yarn porque contienen configuraciones 
-# locales que no son necesarias en el contenedor
+# El --frozen-lockfile asegura que las versiones sean exactamente las del lockfile
 RUN yarn install --frozen-lockfile --network-timeout 300000 --production=false
 
 # Stage 2: Builder

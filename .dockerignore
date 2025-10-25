@@ -59,3 +59,6 @@ docs/
 # Archivos de configuración locales
 .yarnrc.yml
 .yarn/
+# Incluir yarn backup para Docker build
+!.yarn-backup/
+!.yarn-backup/yarn.lock.master
