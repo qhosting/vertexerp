@@ -1,0 +1,47 @@
+# 🚀 Roadmap de Pendientes y Futuras Mejoras
+
+Este documento describe las funcionalidades planificadas para futuras versiones del **Sistema ERP Completo**, así como tareas de mantenimiento continuo.
+
+---
+
+## 🔮 Próximas Versiones Planificadas
+
+### 🔜 v4.1: Expansión de Facturación y Cumplimiento
+**Objetivo**: Ampliar las capacidades fiscales y de cumplimiento normativo.
+- [ ] **Integración con más PACs**: Añadir soporte para proveedores adicionales de facturación.
+- [ ] **Complementos de Carta Porte**: Implementación de complementos específicos del SAT.
+- [ ] **Validación de RFCs**: Verificación en tiempo real de datos fiscales.
+
+### 🔜 v4.2: Ecosistema Móvil Nativo
+**Objetivo**: Llevar la experiencia móvil al siguiente nivel con aplicaciones nativas.
+- [ ] **App iOS/Android (React Native)**: Desarrollo de aplicaciones nativas para mejor rendimiento y acceso a hardware.
+- [ ] **Notificaciones Push Nativas**: Sistema de alertas avanzado.
+- [ ] **Escaneo de Códigos de Barras**: Uso de cámara nativa para inventario rápido.
+
+### 🔜 v4.3: Inteligencia Artificial Avanzada (ML)
+**Objetivo**: Profundizar en el análisis de datos y automatización inteligente.
+- [ ] **Predicción de Demanda**: Modelos de ML para optimizar stock.
+- [ ] **Scoring de Clientes Avanzado**: Análisis de comportamiento para riesgo crediticio.
+- [ ] **Chatbot Asistente**: Asistente virtual integrado para consultas rápidas del sistema.
+
+### 🔜 v4.4: Integraciones Contables y ERPs Externos
+**Objetivo**: Conectar con sistemas contables tradicionales.
+- [ ] **Exportación a COI/Contpaqi**: Generación de pólizas para sistemas contables.
+- [ ] **Sincronización Bancaria**: API para conciliación bancaria directa.
+
+---
+
+## 🛠️ Mantenimiento y Mejora Continua
+
+### Seguridad
+- [ ] **Auditorías de Seguridad Trimestrales**: Revisión de vulnerabilidades.
+- [ ] **Rotación de Secretos**: Actualización periódica de claves de API y tokens.
+- [ ] **Autenticación 2FA**: Implementación de doble factor opcional para usuarios.
+
+### Performance
+- [ ] **Optimización de Consultas**: Revisión continua de querys lentos.
+- [ ] **Archivado de Datos Históricos**: Estrategia para mover datos antiguos a almacenamiento frío.
+
+### Documentación
+- [ ] **Video Tutoriales**: Crear guías visuales para usuarios finales.
+- [ ] **Actualización de API Docs**: Mantener sincronizada la documentación de Swagger/OpenAPI.

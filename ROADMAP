@@ -1,0 +1,67 @@
+# 🗺️ Roadmap del Proyecto - Sistema ERP Completo
+
+Este documento detalla la hoja de ruta seguida para el desarrollo del **Sistema ERP Completo v4.0**, destacando los hitos alcanzados en cada fase.
+
+**Estado Actual**: ✅ **COMPLETADO (v4.0.0)**
+
+---
+
+## 🏁 Historial de Fases Completadas
+
+### ✅ FASE 1: Fundación (v1.0.0)
+**Objetivo**: Establecer la base técnica y las funcionalidades core del sistema.
+
+- [x] **Arquitectura y Configuración**
+  - Setup de Next.js 14, TypeScript, Prisma y PostgreSQL.
+  - Implementación de autenticación segura con NextAuth.js.
+  - Diseño de UI/UX base con Tailwind CSS y componentes reutilizables.
+
+- [x] **Módulos Core**
+  - **Dashboard Ejecutivo**: Métricas en tiempo real.
+  - **Gestión de Clientes**: CRUD completo y perfiles.
+  - **Catálogo de Productos**: Inventario y control de stock.
+  - **Sistema de Ventas**: Proceso de venta y generación de tickets.
+  - **Gestión de Pagarés**: Generación automática básica.
+
+### ✅ FASE 2: Cobranza y Finanzas (v2.0.0)
+**Objetivo**: Robustecer el sistema financiero y de cobranza.
+
+- [x] **Cobranza Avanzada**
+  - Seguimiento detallado de pagos y estados.
+  - Estrategias de cobranza y alertas.
+
+- [x] **Gestión Financiera**
+  - **Intereses Moratorios**: Cálculo automático diario.
+  - **Reestructuras**: Proceso de renegociación de deudas.
+  - **Notas de Cargo/Crédito**: Ajustes contables.
+  - **Dashboard Financiero**: Indicadores de cartera y flujo.
+
+### ✅ FASE 3: Operaciones Avanzadas (v3.0.0)
+**Objetivo**: Expandir las capacidades operativas y movilidad.
+
+- [x] **Movilidad y Offline**
+  - **PWA**: Aplicación instalable con soporte offline.
+  - Sincronización automática de datos.
+
+- [x] **Funcionalidades Extendidas**
+  - **Garantías**: Gestión de garantías de productos.
+  - **Comunicaciones**: Integración SMS, WhatsApp y Email.
+  - **Crédito Avanzado**: Scoring y límites dinámicos.
+  - **Cuentas por Pagar**: Gestión de proveedores y pagos.
+
+### ✅ FASE 4: Automatización e Integraciones (v4.0.0)
+**Objetivo**: Automatizar procesos y conectar con el ecosistema externo.
+
+- [x] **Automatización**
+  - **Workflows**: Flujos de trabajo personalizables.
+  - **Auditoría**: Logs detallados y tracking de seguridad.
+
+- [x] **Integraciones y Negocio**
+  - **Compras**: Ciclo completo de aprovisionamiento.
+  - **Facturación (CFDI)**: Integración con PACs para México.
+  - **Business Intelligence**: Análisis predictivo con IA.
+  - **APIs Externas**: Webhooks y conectividad de terceros.
+
+---
+
+**Resumen**: El proyecto ha cumplido el 100% de los objetivos planteados inicialmente, entregando un ERP robusto, escalable y completo.
