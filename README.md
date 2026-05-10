@@ -1,6 +1,12 @@
 
 # 🏢 VertexERP v4.0
 
+## 📈 Estado del Proyecto (Mayo 2026)
+
+- **Despliegue:** ✅ [Push a GitHub Exitoso (Mayo 2026)](./GITHUB_PUSH_SUCCESS_2026.md)
+- **Versión Actual:** v4.0.0-stable
+- **Build Status:** Passing (Easypanel Multi-stage)
+
 ## Descripción del Proyecto
 
 **VertexERP** es un Sistema ERP (Enterprise Resource Planning) completo desarrollado con **Next.js 14**, **TypeScript**, **Prisma**, **PostgreSQL** y **Tailwind CSS**. Diseñado específicamente para empresas que manejan ventas a crédito, cobranza, inventario y gestión integral de clientes.
