@@ -185,10 +185,10 @@ ABACUSAI_API_KEY="tu_api_key"
 
 ## 📞 Soporte y Documentación
 
+- **Roadmap Consolidado**: [ROADMAP.md](./ROADMAP.md)
 - **Documentación Técnica**: `/docs`
-- **Guía de Importación**: `DEEPAGENT_IMPORT_GUIDE.md`
-- **Changelog**: `CHANGELOG_v4.md`
-- **Estado del Proyecto**: `PROYECTO_STATUS.md`
+- **Guía de Instalación**: [`docs/DEPLOYMENT_GUIDE.md`](./docs/DEPLOYMENT_GUIDE.md)
+- **Changelog**: [`docs/CHANGELOG.md`](./docs/CHANGELOG.md)
 
 ## 🤝 Contribuir
 
