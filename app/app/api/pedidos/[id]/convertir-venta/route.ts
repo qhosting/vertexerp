@@ -108,9 +108,9 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     }
 
     // Crear venta con transacción
-    const result = await prisma.$transaction(async (prisma) => {
+    const result = await prisma.$transaction(async (tx: any) => {
       // 1. Crear la venta
-      const venta = await prisma.venta.create({
+      const venta = await tx.venta.create({
         data: {
           folio: folioVenta,
           numeroFactura: validatedData.numeroFactura,
@@ -132,7 +132,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
           fechaAfectacionInventario: validatedData.aplicarInventario ? new Date() : undefined,
           observaciones: validatedData.observaciones,
           detalles: {
-            create: pedido.detalles.map(detalle => ({
+            create: pedido.detalles.map((detalle: any) => ({
               productoId: detalle.productoId,
               cantidad: detalle.cantidad,
               precioUnitario: detalle.precioUnitario,
@@ -169,7 +169,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
           })
         }
 
-        await prisma.pagare.createMany({
+        await tx.pagare.createMany({
           data: pagares
         })
       }
@@ -177,7 +177,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       // 3. Actualizar inventario si aplica
       if (validatedData.aplicarInventario) {
         for (const detalle of pedido.detalles) {
-          await prisma.producto.update({
+          await tx.producto.update({
             where: { id: detalle.productoId },
             data: {
               stock: {
@@ -187,7 +187,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
           })
 
           // Registrar movimiento de inventario
-          await prisma.movimientoInventario.create({
+          await tx.movimientoInventario.create({
             data: {
               productoId: detalle.productoId,
               tipo: 'SALIDA',
@@ -202,7 +202,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       }
 
       // 4. Marcar pedido como convertido
-      await prisma.pedido.update({
+      await tx.pedido.update({
         where: { id: pedido.id },
         data: {
           estatus: 'CONVERTIDO_VENTA',
