@@ -45,9 +45,9 @@ export async function POST(
     }
 
     // Iniciar transacción para aplicar la nota de cargo
-    const resultado = await prisma.$transaction(async (prisma) => {
+    const resultado = await prisma.$transaction(async (tx: any) => {
       // Marcar la nota como aplicada
-      const notaActualizada = await prisma.notaCargo.update({
+      const notaActualizada = await tx.notaCargo.update({
         where: { id: params.id },
         data: {
           aplicada: true,
@@ -78,7 +78,7 @@ export async function POST(
       });
 
       // Actualizar el saldo del cliente
-      await prisma.cliente.update({
+      await tx.cliente.update({
         where: { id: notaCargo.clienteId },
         data: {
           saldoActual: {
@@ -89,7 +89,7 @@ export async function POST(
 
       // Si hay venta asociada, actualizar su saldo pendiente
       if (notaCargo.ventaId) {
-        await prisma.venta.update({
+        await tx.venta.update({
           where: { id: notaCargo.ventaId },
           data: {
             saldoPendiente: {
@@ -100,7 +100,7 @@ export async function POST(
       }
 
       // Crear registro en el historial de crédito
-      await prisma.creditoHistorial.create({
+      await tx.creditoHistorial.create({
         data: {
           clienteId: notaCargo.clienteId,
           evento: `Nota de cargo aplicada: ${notaCargo.concepto}`,

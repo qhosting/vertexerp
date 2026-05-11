@@ -140,7 +140,7 @@ export async function POST(request: NextRequest) {
 
     // Calcular totales
     let subtotal = 0
-    const detallesCalculados = validatedData.detalles.map(detalle => {
+    const detallesCalculados = validatedData.detalles.map((detalle: any) => {
       const subtotalDetalle = (detalle.cantidad * detalle.precioUnitario) - detalle.descuento
       subtotal += subtotalDetalle
       return {
@@ -153,8 +153,8 @@ export async function POST(request: NextRequest) {
     const total = subtotal + iva
 
     // Crear pedido con transacción
-    const pedido = await prisma.$transaction(async (prisma) => {
-      const nuevoPedido = await prisma.pedido.create({
+    const pedido = await prisma.$transaction(async (tx: any) => {
+      const nuevoPedido = await tx.pedido.create({
         data: {
           folio,
           clienteId: validatedData.clienteId,

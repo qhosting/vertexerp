@@ -50,9 +50,9 @@ export async function POST(
     }
 
     // Iniciar transacción para aplicar la nota de crédito
-    const resultado = await prisma.$transaction(async (prisma) => {
+    const resultado = await prisma.$transaction(async (tx: any) => {
       // Marcar la nota como aplicada
-      const notaActualizada = await prisma.notaCredito.update({
+      const notaActualizada = await tx.notaCredito.update({
         where: { id: params.id },
         data: {
           aplicada: true,
@@ -94,7 +94,7 @@ export async function POST(
       });
 
       // Actualizar el saldo del cliente (reducir deuda)
-      await prisma.cliente.update({
+      await tx.cliente.update({
         where: { id: notaCredito.clienteId },
         data: {
           saldoActual: {
@@ -105,7 +105,7 @@ export async function POST(
 
       // Si hay venta asociada, actualizar su saldo pendiente
       if (notaCredito.ventaId) {
-        await prisma.venta.update({
+        await tx.venta.update({
           where: { id: notaCredito.ventaId },
           data: {
             saldoPendiente: {
@@ -120,7 +120,7 @@ export async function POST(
         for (const detalle of notaCredito.detalles) {
           if (detalle.productoId && detalle.cantidad) {
             // Incrementar stock (devolver productos)
-            await prisma.producto.update({
+            await tx.producto.update({
               where: { id: detalle.productoId },
               data: {
                 stock: {
@@ -130,7 +130,7 @@ export async function POST(
             });
 
             // Registrar movimiento de inventario
-            await prisma.movimientoInventario.create({
+            await tx.movimientoInventario.create({
               data: {
                 productoId: detalle.productoId,
                 tipo: 'ENTRADA',
@@ -147,7 +147,7 @@ export async function POST(
       }
 
       // Crear registro en el historial de crédito
-      await prisma.creditoHistorial.create({
+      await tx.creditoHistorial.create({
         data: {
           clienteId: notaCredito.clienteId,
           evento: `Nota de crédito aplicada: ${notaCredito.concepto}`,

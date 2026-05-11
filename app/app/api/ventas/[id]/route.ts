@@ -356,15 +356,15 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     }
 
     // Cancelar venta y revertir inventario si aplica
-    await prisma.$transaction(async (prisma) => {
+    await prisma.$transaction(async (tx: any) => {
       // Actualizar status
-      await prisma.venta.update({
+      await tx.venta.update({
         where: { id: params.id },
         data: { status: 'CANCELADA' }
       })
 
       // Cancelar pagarés
-      await prisma.pagare.updateMany({
+      await tx.pagare.updateMany({
         where: { ventaId: params.id },
         data: { estatus: 'CANCELADO' }
       })
@@ -372,7 +372,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       // Revertir inventario si fue afectado
       if (venta.inventarioAfectado) {
         for (const detalle of venta.detalles) {
-          await prisma.producto.update({
+          await tx.producto.update({
             where: { id: detalle.productoId },
             data: {
               stock: {
@@ -381,7 +381,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
             }
           })
 
-          await prisma.movimientoInventario.create({
+          await tx.movimientoInventario.create({
             data: {
               productoId: detalle.productoId,
               tipo: 'ENTRADA',

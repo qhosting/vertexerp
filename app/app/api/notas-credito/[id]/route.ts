@@ -111,14 +111,14 @@ export async function DELETE(
     }
 
     // Eliminar nota y sus detalles en transacción
-    await prisma.$transaction(async (prisma) => {
+    await prisma.$transaction(async (tx: any) => {
       // Eliminar detalles
-      await prisma.detalleNotaCredito.deleteMany({
+      await tx.detalleNotaCredito.deleteMany({
         where: { notaCreditoId: params.id },
       });
 
       // Eliminar nota
-      await prisma.notaCredito.delete({
+      await tx.notaCredito.delete({
         where: { id: params.id },
       });
     });

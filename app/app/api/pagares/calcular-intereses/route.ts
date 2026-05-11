@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
     let pagaresActualizados = 0
 
     // Actualizar cada pagaré con sus intereses correspondientes
-    await prisma.$transaction(async (prisma) => {
+    await prisma.$transaction(async (tx: any) => {
       for (const pagare of pagaresVencidos) {
         const fechaVencimiento = new Date(pagare.fechaVencimiento)
         const diasVencido = Math.floor((hoy.getTime() - fechaVencimiento.getTime()) / (1000 * 60 * 60 * 24))
@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
           const montoVencido = pagare.monto - pagare.montoPagado
           const interesesCalculados = montoVencido * (pagare.tasaInteresMora / 100) * diasVencido
 
-          await prisma.pagare.update({
+          await tx.pagare.update({
             where: { id: pagare.id },
             data: {
               diasVencido,
@@ -147,7 +147,7 @@ export async function GET(request: NextRequest) {
       }
     })
 
-    const preview = pagaresVencidos.map(pagare => {
+    const preview = pagaresVencidos.map((pagare: any) => {
       const fechaVencimiento = new Date(pagare.fechaVencimiento)
       const diasVencido = Math.floor((hoy.getTime() - fechaVencimiento.getTime()) / (1000 * 60 * 60 * 24))
       const montoVencido = pagare.monto - pagare.montoPagado

@@ -122,9 +122,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Crear la reestructura con transacción
-    const reestructura = await prisma.$transaction(async (prisma) => {
+    const reestructura = await prisma.$transaction(async (tx: any) => {
       // Desactivar reestructuras anteriores de esta venta
-      await prisma.reestructuraCredito.updateMany({
+      await tx.reestructuraCredito.updateMany({
         where: {
           ventaId: ventaId,
           activa: true,
@@ -135,7 +135,7 @@ export async function POST(request: NextRequest) {
       });
 
       // Crear nueva reestructura
-      const nuevaReestructura = await prisma.reestructuraCredito.create({
+      const nuevaReestructura = await tx.reestructuraCredito.create({
         data: {
           ventaId,
           clienteId,
@@ -182,7 +182,7 @@ export async function POST(request: NextRequest) {
       });
 
       // Actualizar la venta con las nuevas condiciones
-      await prisma.venta.update({
+      await tx.venta.update({
         where: { id: ventaId },
         data: {
           saldoPendiente: nuevaReestructura.saldoNuevo,
@@ -195,7 +195,7 @@ export async function POST(request: NextRequest) {
 
       // Actualizar el saldo del cliente si hay descuento
       if (parseFloat(descuentoOtorgado) > 0) {
-        await prisma.cliente.update({
+        await tx.cliente.update({
           where: { id: clienteId },
           data: {
             saldoActual: {
@@ -206,7 +206,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Crear registro en historial de crédito
-      await prisma.creditoHistorial.create({
+      await tx.creditoHistorial.create({
         data: {
           clienteId,
           evento: `Reestructura de crédito autorizada`,

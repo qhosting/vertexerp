@@ -94,7 +94,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     }
 
     // Aplicar pago con transacción
-    const resultado = await prisma.$transaction(async (prisma) => {
+    const resultado = await prisma.$transaction(async (tx: any) => {
       // Calcular distribución del pago
       let aplicadoInteres = 0
       let aplicadoCapital = 0
@@ -112,7 +112,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       const folioPago = `PAG-${Date.now()}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`
 
       // Crear registro de pago
-      const pago = await prisma.pago.create({
+      const pago = await tx.pago.create({
         data: {
           folio: folioPago,
           referencia: validatedData.referencia || folioPago,
@@ -132,7 +132,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       })
 
       // Crear detalle de pago del pagaré
-      await prisma.detallePagoPagare.create({
+      await tx.detallePagoPagare.create({
         data: {
           pagareId: pagare.id,
           pagoId: pago.id,
@@ -157,7 +157,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         nuevoEstatus = 'VENCIDO'
       }
 
-      const pagareActualizado = await prisma.pagare.update({
+      const pagareActualizado = await tx.pagare.update({
         where: { id: pagare.id },
         data: {
           montoPagado: nuevoMontoPagado,
@@ -170,14 +170,14 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       })
 
       // Verificar si la venta está completamente pagada
-      const todosLosPagares = await prisma.pagare.findMany({
+      const todosLosPagares = await tx.pagare.findMany({
         where: { ventaId: pagare.ventaId }
       })
 
       const ventaCompletamentePagada = todosLosPagares.every(p => p.estatus === 'PAGADO')
 
       if (ventaCompletamentePagada) {
-        await prisma.venta.update({
+        await tx.venta.update({
           where: { id: pagare.ventaId },
           data: { status: 'PAGADA' }
         })

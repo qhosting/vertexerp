@@ -145,8 +145,8 @@ export async function POST(request: NextRequest) {
     const folio = `NCR-${numeroSecuencial.toString().padStart(6, '0')}`;
 
     // Crear la nota de crédito con transacción
-    const notaCredito = await prisma.$transaction(async (prisma) => {
-      const nota = await prisma.notaCredito.create({
+    const notaCredito = await prisma.$transaction(async (tx: any) => {
+      const nota = await tx.notaCredito.create({
         data: {
           folio,
           clienteId,
@@ -161,7 +161,7 @@ export async function POST(request: NextRequest) {
 
       // Si hay detalles de productos, crearlos
       if (detalles && detalles.length > 0) {
-        await prisma.detalleNotaCredito.createMany({
+        await tx.detalleNotaCredito.createMany({
           data: detalles.map((detalle: any) => ({
             notaCreditoId: nota.id,
             productoId: detalle.productoId,
