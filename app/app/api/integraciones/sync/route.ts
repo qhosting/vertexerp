@@ -307,7 +307,7 @@ async function sincronizarInventario(destino: string, configuracion: any) {
       success: true,
       destino,
       productos: resultados.length,
-      sincronizados: resultados.filter(r => r.sincronizado).length,
+      sincronizados: resultados.filter((r: any) => r.sincronizado).length,
     });
   } catch (error) {
     console.error('Error sincronizando inventario:', error);

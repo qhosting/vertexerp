@@ -130,9 +130,9 @@ export async function GET(request: NextRequest) {
 
     // Calcular estadísticas adicionales
     const ventasConEstadisticas = ventas.map((venta: any) => {
-      const pagaresVencidos = venta.pagares.filter(p => p.estatus === 'VENCIDO').length
-      const pagarePendiente = venta.pagares.find(p => p.estatus === 'PENDIENTE')
-      const totalPagado = venta.pagares.reduce((sum, p) => sum + p.montoPagado, 0) + venta.pagoInicial
+      const pagaresVencidos = venta.pagares.filter((p: any) => p.estatus === 'VENCIDO').length
+      const pagarePendiente = venta.pagares.find((p: any) => p.estatus === 'PENDIENTE')
+      const totalPagado = venta.pagares.reduce((sum: number, p: any) => sum + p.montoPagado, 0) + venta.pagoInicial
       
       return {
         ...venta,
