@@ -55,9 +55,9 @@ export async function POST(request: NextRequest) {
     const result = await smsService.sendBulkSMS(messages);
 
     if (result.success && result.results) {
-      const successCount = result.results.filter(r => r.success).length;
+      const successCount = result.results.filter((r: any) => r.success).length;
       const failCount = result.results.length - successCount;
-      const totalCost = result.results.reduce((sum, r) => sum + (r.cost || 0), 0);
+      const totalCost = result.results.reduce((sum: number, r: any) => sum + (r.cost || 0), 0);
 
       return NextResponse.json({
         success: true,

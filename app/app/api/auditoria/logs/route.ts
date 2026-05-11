@@ -201,19 +201,19 @@ export async function GET(request: NextRequest) {
     let filteredLogs = logs;
 
     if (modulo) {
-      filteredLogs = filteredLogs.filter(log => log.modulo === modulo);
+      filteredLogs = filteredLogs.filter((log: any) => log.modulo === modulo);
     }
 
     if (usuario) {
-      filteredLogs = filteredLogs.filter(log => log.usuario.id === usuario);
+      filteredLogs = filteredLogs.filter((log: any) => log.usuario.id === usuario);
     }
 
     if (resultado) {
-      filteredLogs = filteredLogs.filter(log => log.resultado === resultado);
+      filteredLogs = filteredLogs.filter((log: any) => log.resultado === resultado);
     }
 
     if (fechaInicio && fechaFin) {
-      filteredLogs = filteredLogs.filter(log => {
+      filteredLogs = filteredLogs.filter((log: any) => {
         const fecha = new Date(log.timestamp);
         return fecha >= new Date(fechaInicio) && fecha <= new Date(fechaFin);
       });
@@ -226,21 +226,21 @@ export async function GET(request: NextRequest) {
     // Estadísticas
     const stats = {
       total: totalCount,
-      exitosos: filteredLogs.filter(l => l.resultado === 'EXITOSO').length,
-      errores: filteredLogs.filter(l => l.resultado === 'ERROR').length,
-      advertencias: filteredLogs.filter(l => l.resultado === 'ADVERTENCIA').length,
+      exitosos: filteredLogs.filter((l: any) => l.resultado === 'EXITOSO').length,
+      errores: filteredLogs.filter((l: any) => l.resultado === 'ERROR').length,
+      advertencias: filteredLogs.filter((l: any) => l.resultado === 'ADVERTENCIA').length,
       modulosMasActivos: Object.entries(
-        filteredLogs.reduce((acc: Record<string, number>, log) => {
+        filteredLogs.reduce((acc: Record<string, number>, log: any) => {
           acc[log.modulo] = (acc[log.modulo] || 0) + 1;
           return acc;
         }, {})
-      ).sort(([,a], [,b]) => b - a).slice(0, 5),
+      ).sort(([,a], [,b]) => (b as number) - (a as number)).slice(0, 5),
       usuariosMasActivos: Object.entries(
-        filteredLogs.reduce((acc: Record<string, number>, log) => {
+        filteredLogs.reduce((acc: Record<string, number>, log: any) => {
           acc[log.usuario.nombre] = (acc[log.usuario.nombre] || 0) + 1;
           return acc;
         }, {})
-      ).sort(([,a], [,b]) => b - a).slice(0, 5)
+      ).sort(([,a], [,b]) => (b as number) - (a as number)).slice(0, 5)
     };
 
     return NextResponse.json({

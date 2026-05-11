@@ -186,19 +186,19 @@ export async function GET(request: NextRequest) {
     let filteredChanges = changes;
 
     if (tabla) {
-      filteredChanges = filteredChanges.filter(change => change.tabla === tabla);
+      filteredChanges = filteredChanges.filter((change: any) => change.tabla === tabla);
     }
 
     if (operacion) {
-      filteredChanges = filteredChanges.filter(change => change.operacion === operacion);
+      filteredChanges = filteredChanges.filter((change: any) => change.operacion === operacion);
     }
 
     if (usuario) {
-      filteredChanges = filteredChanges.filter(change => change.usuario.id === usuario);
+      filteredChanges = filteredChanges.filter((change: any) => change.usuario.id === usuario);
     }
 
     if (fechaInicio && fechaFin) {
-      filteredChanges = filteredChanges.filter(change => {
+      filteredChanges = filteredChanges.filter((change: any) => {
         const fecha = new Date(change.timestamp);
         return fecha >= new Date(fechaInicio) && fecha <= new Date(fechaFin);
       });
@@ -212,21 +212,21 @@ export async function GET(request: NextRequest) {
     // Estadísticas de cambios
     const changeStats = {
       total: filteredChanges.length,
-      inserciones: filteredChanges.filter(c => c.operacion === 'INSERT').length,
-      actualizaciones: filteredChanges.filter(c => c.operacion === 'UPDATE').length,
-      eliminaciones: filteredChanges.filter(c => c.operacion === 'DELETE').length,
+      inserciones: filteredChanges.filter((c: any) => c.operacion === 'INSERT').length,
+      actualizaciones: filteredChanges.filter((c: any) => c.operacion === 'UPDATE').length,
+      eliminaciones: filteredChanges.filter((c: any) => c.operacion === 'DELETE').length,
       tablasMasModificadas: Object.entries(
-        filteredChanges.reduce((acc: Record<string, number>, change) => {
+        filteredChanges.reduce((acc: Record<string, number>, change: any) => {
           acc[change.tabla] = (acc[change.tabla] || 0) + 1;
           return acc;
         }, {})
-      ).sort(([,a], [,b]) => b - a).slice(0, 5),
+      ).sort(([,a], [,b]) => (b as number) - (a as number)).slice(0, 5),
       usuariosMasActivos: Object.entries(
-        filteredChanges.reduce((acc: Record<string, number>, change) => {
+        filteredChanges.reduce((acc: Record<string, number>, change: any) => {
           acc[change.usuario.nombre] = (acc[change.usuario.nombre] || 0) + 1;
           return acc;
         }, {})
-      ).sort(([,a], [,b]) => b - a).slice(0, 5)
+      ).sort(([,a], [,b]) => (b as number) - (a as number)).slice(0, 5)
     };
 
     return NextResponse.json({

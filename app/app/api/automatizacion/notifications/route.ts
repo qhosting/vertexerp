@@ -115,8 +115,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       notifications,
       total: notifications.length,
-      activas: notifications.filter(n => n.activo).length,
-      totalEnviadas: notifications.reduce((sum, n) => sum + n.enviadas, 0),
+      activas: notifications.filter((n: any) => n.activo).length,
+      totalEnviadas: notifications.reduce((sum: number, n: any) => sum + n.enviadas, 0),
       message: 'Notificaciones obtenidas exitosamente'
     });
 

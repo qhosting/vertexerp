@@ -43,8 +43,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       proveedores,
       total: proveedores.length,
-      activos: proveedores.filter(p => p.activo).length,
-      creditosTotales: proveedores.reduce((sum, p) => sum + p.creditos, 0),
+      activos: proveedores.filter((p: any) => p.activo).length,
+      creditosTotales: proveedores.reduce((sum: number, p: any) => sum + p.creditos, 0),
       message: 'Proveedores PAC obtenidos exitosamente'
     });
 
