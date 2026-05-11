@@ -174,7 +174,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         where: { ventaId: pagare.ventaId }
       })
 
-      const ventaCompletamentePagada = todosLosPagares.every(p => p.estatus === 'PAGADO')
+      const ventaCompletamentePagada = todosLosPagares.every((p: any) => p.estatus === 'PAGADO')
 
       if (ventaCompletamentePagada) {
         await tx.venta.update({
