@@ -57,7 +57,7 @@ export async function POST(
     }
 
     // Procesar según la acción
-    const resultado = await prisma.$transaction(async (prisma) => {
+    const resultado = await prisma.$transaction(async (tx: any) => {
       let updateData: any = {
         diagnostico,
         solucionAplicada: solucionAplicada || `Acción tomada: ${accion}`,
@@ -77,7 +77,7 @@ export async function POST(
           }
 
           // Verificar que el producto de reemplazo existe
-          const productoReemplazo = await prisma.producto.findUnique({
+          const productoReemplazo = await tx.producto.findUnique({
             where: { id: productoReemplazoId },
           });
 
@@ -98,7 +98,7 @@ export async function POST(
           updateData.inventarioAfectado = true;
 
           // Decrementar stock del producto de reemplazo
-          await prisma.producto.update({
+          await tx.producto.update({
             where: { id: productoReemplazoId },
             data: {
               stock: {
@@ -108,7 +108,7 @@ export async function POST(
           });
 
           // Incrementar stock del producto original (devuelto)
-          await prisma.producto.update({
+          await tx.producto.update({
             where: { id: garantia.productoId },
             data: {
               stock: {
@@ -118,7 +118,7 @@ export async function POST(
           });
 
           // Registrar movimientos de inventario
-          await prisma.movimientoInventario.create({
+          await tx.movimientoInventario.create({
             data: {
               productoId: productoReemplazoId,
               tipo: 'SALIDA',
@@ -131,7 +131,7 @@ export async function POST(
             },
           });
 
-          await prisma.movimientoInventario.create({
+          await tx.movimientoInventario.create({
             data: {
               productoId: garantia.productoId,
               tipo: 'ENTRADA',
@@ -156,7 +156,7 @@ export async function POST(
       }
 
       // Actualizar la garantía
-      const garantiaActualizada = await prisma.garantia.update({
+      const garantiaActualizada = await tx.garantia.update({
         where: { id: params.id },
         data: updateData,
         include: {
