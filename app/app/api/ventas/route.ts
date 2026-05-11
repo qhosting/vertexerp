@@ -129,7 +129,7 @@ export async function GET(request: NextRequest) {
     ])
 
     // Calcular estadísticas adicionales
-    const ventasConEstadisticas = ventas.map(venta => {
+    const ventasConEstadisticas = ventas.map((venta: any) => {
       const pagaresVencidos = venta.pagares.filter(p => p.estatus === 'VENCIDO').length
       const pagarePendiente = venta.pagares.find(p => p.estatus === 'PENDIENTE')
       const totalPagado = venta.pagares.reduce((sum, p) => sum + p.montoPagado, 0) + venta.pagoInicial
@@ -210,7 +210,7 @@ export async function POST(request: NextRequest) {
 
     // Calcular totales
     let subtotal = 0
-    const detallesCalculados = validatedData.detalles.map(detalle => {
+    const detallesCalculados = validatedData.detalles.map((detalle: any) => {
       const subtotalDetalle = (detalle.cantidad * detalle.precioUnitario) - detalle.descuento
       subtotal += subtotalDetalle
       return {
@@ -244,9 +244,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Crear venta con transacción
-    const result = await prisma.$transaction(async (prisma) => {
+    const result = await prisma.$transaction(async (tx: any) => {
       // 1. Crear la venta
-      const venta = await prisma.venta.create({
+      const venta = await tx.venta.create({
         data: {
           folio,
           numeroFactura: validatedData.numeroFactura,
@@ -266,7 +266,7 @@ export async function POST(request: NextRequest) {
           fechaAfectacionInventario: validatedData.aplicarInventario ? new Date() : undefined,
           observaciones: validatedData.observaciones,
           detalles: {
-            create: detallesCalculados.map(detalle => ({
+            create: detallesCalculados.map((detalle: any) => ({
               productoId: detalle.productoId,
               cantidad: detalle.cantidad,
               precioUnitario: detalle.precioUnitario,
@@ -299,7 +299,7 @@ export async function POST(request: NextRequest) {
           })
         }
 
-        await prisma.pagare.createMany({
+        await tx.pagare.createMany({
           data: pagares
         })
       }
@@ -307,12 +307,12 @@ export async function POST(request: NextRequest) {
       // 3. Actualizar inventario si aplica
       if (validatedData.aplicarInventario) {
         for (const detalle of detallesCalculados) {
-          const producto = await prisma.producto.findUnique({
+          const producto = await tx.producto.findUnique({
             where: { id: detalle.productoId }
           })
 
           if (producto) {
-            await prisma.producto.update({
+            await tx.producto.update({
               where: { id: detalle.productoId },
               data: {
                 stock: {
@@ -321,7 +321,7 @@ export async function POST(request: NextRequest) {
               }
             })
 
-            await prisma.movimientoInventario.create({
+            await tx.movimientoInventario.create({
               data: {
                 productoId: detalle.productoId,
                 tipo: 'SALIDA',
