@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
         },
       });
 
-      const valoracion = productos.map(producto => ({
+      const valoracion = productos.map((producto: any) => ({
         ...producto,
         valorInventarioCompra: producto.stock * producto.precioCompra,
         valorInventarioVenta: producto.stock * producto.precio1,
@@ -191,7 +191,7 @@ export async function GET(request: NextRequest) {
 
     if (formato === 'csv') {
       const csvHeader = 'Código,Nombre,Categoría,Marca,Stock,Stock Min,Stock Max,Precio Compra,Valor Inventario,Estado\n';
-      const csvData = productos.map(p => [
+      const csvData = productos.map((p: any) => [
         p.codigo,
         p.nombre,
         p.categoria || '',

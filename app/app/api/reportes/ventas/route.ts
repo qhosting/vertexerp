@@ -135,7 +135,7 @@ export async function GET(request: NextRequest) {
     if (formato === 'csv') {
       // Generar CSV
       const csvHeader = 'Folio,Fecha,Cliente,Vendedor,Subtotal,IVA,Total,Saldo Pendiente,Estado\n';
-      const csvData = ventas.map(v => [
+      const csvData = ventas.map((v: any) => [
         v.folio,
         v.fechaVenta.toISOString().split('T')[0],
         v.cliente.nombre,

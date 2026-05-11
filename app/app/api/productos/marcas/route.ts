@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
     });
 
     const marcasLimpias = marcas
-      .map(p => p.marca)
+      .map((p: any) => p.marca)
       .filter(marca => marca !== null && marca.trim() !== '')
       .sort();
 

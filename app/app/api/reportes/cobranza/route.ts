@@ -209,7 +209,7 @@ export async function GET(request: NextRequest) {
 
     if (formato === 'csv') {
       const csvHeader = 'Referencia,Fecha,Cliente,Monto,Tipo Pago,Capital,Interés,Gestor\n';
-      const csvData = pagos.map(p => [
+      const csvData = pagos.map((p: any) => [
         p.referencia,
         p.fechaPago.toISOString().split('T')[0],
         p.cliente.nombre,

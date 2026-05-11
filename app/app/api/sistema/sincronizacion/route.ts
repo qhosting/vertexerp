@@ -146,7 +146,7 @@ export async function GET(request: NextRequest) {
       conAdvertencias: sincronizaciones.filter(s => s.estado === 'ADVERTENCIA').length,
       conErrores: sincronizaciones.filter(s => s.estado === 'ERROR').length,
       totalErrores: sincronizaciones.reduce((sum, s) => sum + s.errores, 0),
-      ultimaActividad: Math.max(...sincronizaciones.map(s => new Date(s.ultimaSincronizacion).getTime())),
+      ultimaActividad: Math.max(...sincronizaciones.map((s: any) => new Date(s.ultimaSincronizacion).getTime())),
       registrosSincronizadosHoy: sincronizaciones.reduce((sum, s) => sum + s.registrosSincronizados, 0)
     };
 

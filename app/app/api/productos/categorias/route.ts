@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
     });
 
     const categoriasLimpias = categorias
-      .map(p => p.categoria)
+      .map((p: any) => p.categoria)
       .filter(cat => cat !== null && cat.trim() !== '')
       .sort();
 
