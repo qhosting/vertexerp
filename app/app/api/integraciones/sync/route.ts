@@ -78,7 +78,7 @@ async function exportarClientes(destino: string, filtros: any) {
     let datosFormateados: any = clientes;
     
     if (destino === 'contabilidad') {
-      datosFormateados = clientes.map(cliente => ({
+      datosFormateados = clientes.map((cliente: any) => ({
         codigo: cliente.codigoCliente,
         razonSocial: cliente.nombre,
         telefono: cliente.telefono1,
@@ -131,7 +131,7 @@ async function exportarProductos(destino: string, filtros: any) {
     let datosFormateados: any = productos;
     
     if (destino === 'ecommerce') {
-      datosFormateados = productos.map(producto => ({
+      datosFormateados = productos.map((producto: any) => ({
         sku: producto.codigo,
         name: producto.nombre,
         description: producto.descripcion,
@@ -191,14 +191,14 @@ async function exportarVentas(destino: string, filtros: any) {
     let datosFormateados: any = ventas;
     
     if (destino === 'contabilidad') {
-      datosFormateados = ventas.map(venta => ({
+      datosFormateados = ventas.map((venta: any) => ({
         folio: venta.folio,
         fecha: venta.fechaVenta.toISOString().split('T')[0],
         cliente: venta.cliente.nombre,
         subtotal: venta.subtotal,
         iva: venta.iva,
         total: venta.total,
-        detalles: venta.detalles.map(detalle => ({
+        detalles: venta.detalles.map((detalle: any) => ({
           producto: detalle.producto.nombre,
           cantidad: detalle.cantidad,
           precio: detalle.precioUnitario,
@@ -296,7 +296,7 @@ async function sincronizarInventario(destino: string, configuracion: any) {
     });
 
     // Simular sincronización (aquí iría la lógica real de API externa)
-    const resultados = productos.map(producto => ({
+    const resultados = productos.map((producto: any) => ({
       codigo: producto.codigo,
       sincronizado: true,
       stockAnterior: producto.stock,
