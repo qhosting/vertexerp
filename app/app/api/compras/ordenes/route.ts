@@ -120,11 +120,11 @@ export async function GET(request: NextRequest) {
     let filteredOrdenes = ordenes;
 
     if (estado) {
-      filteredOrdenes = filteredOrdenes.filter(o => o.estado === estado);
+      filteredOrdenes = filteredOrdenes.filter((o: any) => o.estado === estado);
     }
 
     if (proveedor) {
-      filteredOrdenes = filteredOrdenes.filter(o => o.proveedor.id === proveedor);
+      filteredOrdenes = filteredOrdenes.filter((o: any) => o.proveedor.id === proveedor);
     }
 
     if (limit) {
@@ -134,14 +134,14 @@ export async function GET(request: NextRequest) {
     // Calcular estadísticas
     const estadisticas = {
       total: filteredOrdenes.length,
-      pendientes: filteredOrdenes.filter(o => o.estado === 'PENDIENTE').length,
-      confirmadas: filteredOrdenes.filter(o => o.estado === 'CONFIRMADA').length,
-      recibidas: filteredOrdenes.filter(o => o.estado === 'RECIBIDA').length,
-      canceladas: filteredOrdenes.filter(o => o.estado === 'CANCELADA').length,
-      montoTotal: filteredOrdenes.reduce((sum, o) => sum + o.total, 0),
+      pendientes: filteredOrdenes.filter((o: any) => o.estado === 'PENDIENTE').length,
+      confirmadas: filteredOrdenes.filter((o: any) => o.estado === 'CONFIRMADA').length,
+      recibidas: filteredOrdenes.filter((o: any) => o.estado === 'RECIBIDA').length,
+      canceladas: filteredOrdenes.filter((o: any) => o.estado === 'CANCELADA').length,
+      montoTotal: filteredOrdenes.reduce((sum: number, o: any) => sum + o.total, 0),
       montoPendiente: filteredOrdenes
-        .filter(o => o.estado === 'PENDIENTE' || o.estado === 'CONFIRMADA')
-        .reduce((sum, o) => sum + o.total, 0)
+        .filter((o: any) => o.estado === 'PENDIENTE' || o.estado === 'CONFIRMADA')
+        .reduce((sum: number, o: any) => sum + o.total, 0)
     };
 
     return NextResponse.json({

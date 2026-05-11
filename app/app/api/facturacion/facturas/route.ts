@@ -93,15 +93,15 @@ export async function GET(request: NextRequest) {
     let filteredFacturas = facturas;
 
     if (estado && estado !== 'all') {
-      filteredFacturas = filteredFacturas.filter(f => f.estado === estado);
+      filteredFacturas = filteredFacturas.filter((f: any) => f.estado === estado);
     }
 
     if (pac && pac !== 'all') {
-      filteredFacturas = filteredFacturas.filter(f => f.pac === pac);
+      filteredFacturas = filteredFacturas.filter((f: any) => f.pac === pac);
     }
 
     if (fechaInicio && fechaFin) {
-      filteredFacturas = filteredFacturas.filter(f => {
+      filteredFacturas = filteredFacturas.filter((f: any) => {
         const fecha = new Date(f.fecha);
         return fecha >= new Date(fechaInicio) && fecha <= new Date(fechaFin);
       });
@@ -115,13 +115,13 @@ export async function GET(request: NextRequest) {
     // Estadísticas
     const estadisticas = {
       total: filteredFacturas.length,
-      timbradas: filteredFacturas.filter(f => f.estado === 'TIMBRADA').length,
-      pendientes: filteredFacturas.filter(f => f.estado === 'PENDIENTE').length,
-      canceladas: filteredFacturas.filter(f => f.estado === 'CANCELADA').length,
-      montoTotal: filteredFacturas.reduce((sum, f) => sum + f.total, 0),
+      timbradas: filteredFacturas.filter((f: any) => f.estado === 'TIMBRADA').length,
+      pendientes: filteredFacturas.filter((f: any) => f.estado === 'PENDIENTE').length,
+      canceladas: filteredFacturas.filter((f: any) => f.estado === 'CANCELADA').length,
+      montoTotal: filteredFacturas.reduce((sum: number, f: any) => sum + f.total, 0),
       montoTimbrado: filteredFacturas
-        .filter(f => f.estado === 'TIMBRADA')
-        .reduce((sum, f) => sum + f.total, 0)
+        .filter((f: any) => f.estado === 'TIMBRADA')
+        .reduce((sum: number, f: any) => sum + f.total, 0)
     };
 
     return NextResponse.json({

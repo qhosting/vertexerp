@@ -89,17 +89,17 @@ export async function GET(request: NextRequest) {
     // Calcular resúmenes
     const resumen = {
       totalVentas: ventas.length,
-      montoTotal: ventas.reduce((sum, v) => sum + v.total, 0),
-      montoCobrado: ventas.reduce((sum, v) => 
-        sum + v.pagos.reduce((sumP, p) => sumP + p.monto, 0), 0
+      montoTotal: ventas.reduce((sum: number, v: any) => sum + v.total, 0),
+      montoCobrado: ventas.reduce((sum: number, v: any) => 
+        sum + v.pagos.reduce((sumP: number, p: any) => sumP + p.monto, 0), 0
       ),
-      saldoPendiente: ventas.reduce((sum, v) => sum + v.saldoPendiente, 0),
+      saldoPendiente: ventas.reduce((sum: number, v: any) => sum + v.saldoPendiente, 0),
       promedioVenta: ventas.length > 0 ? 
-        ventas.reduce((sum, v) => sum + v.total, 0) / ventas.length : 0,
+        ventas.reduce((sum: number, v: any) => sum + v.total, 0) / ventas.length : 0,
     };
 
     // Resumen por vendedor
-    const ventasPorVendedor = ventas.reduce((acc: any, venta) => {
+    const ventasPorVendedor = ventas.reduce((acc: any, venta: any) => {
       const vendedor = venta.vendedor.firstName || venta.vendedor.name || 'Sin asignar';
       if (!acc[vendedor]) {
         acc[vendedor] = {
@@ -111,13 +111,13 @@ export async function GET(request: NextRequest) {
       }
       acc[vendedor].cantidadVentas += 1;
       acc[vendedor].montoTotal += venta.total;
-      acc[vendedor].montoCobrado += venta.pagos.reduce((sum, p) => sum + p.monto, 0);
+      acc[vendedor].montoCobrado += venta.pagos.reduce((sum: number, p: any) => sum + p.monto, 0);
       acc[vendedor].saldoPendiente += venta.saldoPendiente;
       return acc;
     }, {});
 
     // Resumen por producto
-    const ventasPorProducto = ventas.flatMap(v => v.detalles).reduce((acc: any, detalle) => {
+    const ventasPorProducto = ventas.flatMap((v: any) => v.detalles).reduce((acc: any, detalle: any) => {
       const producto = `${detalle.producto.codigo} - ${detalle.producto.nombre}`;
       if (!acc[producto]) {
         acc[producto] = {

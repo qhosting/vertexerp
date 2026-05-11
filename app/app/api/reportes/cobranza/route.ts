@@ -125,13 +125,13 @@ export async function GET(request: NextRequest) {
 
       const resumenPagares = {
         totalPagares: pagares.length,
-        montotal: pagares.reduce((sum, p) => sum + p.monto, 0),
-        montoPagado: pagares.reduce((sum, p) => sum + p.montoPagado, 0),
-        saldoPendiente: pagares.reduce((sum, p) => sum + (p.monto - p.montoPagado), 0),
-        interesesMora: pagares.reduce((sum, p) => sum + p.interesesMora, 0),
-        pagaresPendientes: pagares.filter(p => p.estatus === 'PENDIENTE').length,
-        pagaresVencidos: pagares.filter(p => p.estatus === 'VENCIDO').length,
-        pagaresPagados: pagares.filter(p => p.estatus === 'PAGADO').length,
+        montotal: pagares.reduce((sum: number, p: any) => sum + p.monto, 0),
+        montoPagado: pagares.reduce((sum: number, p: any) => sum + p.montoPagado, 0),
+        saldoPendiente: pagares.reduce((sum: number, p: any) => sum + (p.monto - p.montoPagado), 0),
+        interesesMora: pagares.reduce((sum: number, p: any) => sum + p.interesesMora, 0),
+        pagaresPendientes: pagares.filter((p: any) => p.estatus === 'PENDIENTE').length,
+        pagaresVencidos: pagares.filter((p: any) => p.estatus === 'VENCIDO').length,
+        pagaresPagados: pagares.filter((p: any) => p.estatus === 'PAGADO').length,
       };
 
       return NextResponse.json({
@@ -196,15 +196,15 @@ export async function GET(request: NextRequest) {
 
     const resumenPagos = {
       totalPagos: pagos.length,
-      montoTotal: pagos.reduce((sum, p) => sum + p.monto, 0),
-      aplicadoCapital: pagos.reduce((sum, p) => sum + p.aplicadoCapital, 0),
-      aplicadoInteres: pagos.reduce((sum, p) => sum + p.aplicadoInteres, 0),
-      pagosPorTipo: pagos.reduce((acc: any, pago) => {
+      montoTotal: pagos.reduce((sum: number, p: any) => sum + p.monto, 0),
+      aplicadoCapital: pagos.reduce((sum: number, p: any) => sum + p.aplicadoCapital, 0),
+      aplicadoInteres: pagos.reduce((sum: number, p: any) => sum + p.aplicadoInteres, 0),
+      pagosPorTipo: pagos.reduce((acc: any, pago: any) => {
         acc[pago.tipoPago] = (acc[pago.tipoPago] || 0) + pago.monto;
         return acc;
       }, {}),
       promediosPago: pagos.length > 0 ? 
-        pagos.reduce((sum, p) => sum + p.monto, 0) / pagos.length : 0,
+        pagos.reduce((sum: number, p: any) => sum + p.monto, 0) / pagos.length : 0,
     };
 
     if (formato === 'csv') {
