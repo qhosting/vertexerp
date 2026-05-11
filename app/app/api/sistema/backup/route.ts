@@ -131,18 +131,18 @@ export async function GET(request: NextRequest) {
     // Calcular estadísticas
     const stats = {
       total: backups.length,
-      completados: backups.filter(b => b.estado === 'COMPLETADO').length,
-      fallidos: backups.filter(b => b.estado === 'FALLIDO').length,
+      completados: backups.filter((b: any) => b.estado === 'COMPLETADO').length,
+      fallidos: backups.filter((b: any) => b.estado === 'FALLIDO').length,
       ultimoBackup: backups[0]?.fecha,
       espacioUsado: backups
-        .filter(b => b.estado === 'COMPLETADO')
-        .reduce((sum, b) => sum + b.tamañoBytes, 0),
+        .filter((b: any) => b.estado === 'COMPLETADO')
+        .reduce((sum: number, b: any) => sum + b.tamañoBytes, 0),
       promedioTamaño: backups
-        .filter(b => b.estado === 'COMPLETADO')
-        .reduce((sum, b) => sum + b.tamañoBytes, 0) / backups.filter(b => b.estado === 'COMPLETADO').length,
+        .filter((b: any) => b.estado === 'COMPLETADO')
+        .reduce((sum: number, b: any) => sum + b.tamañoBytes, 0) / backups.filter((b: any) => b.estado === 'COMPLETADO').length,
       promedioDuracion: backups
-        .filter(b => b.estado === 'COMPLETADO')
-        .reduce((sum, b) => sum + b.duracion, 0) / backups.filter(b => b.estado === 'COMPLETADO').length
+        .filter((b: any) => b.estado === 'COMPLETADO')
+        .reduce((sum: number, b: any) => sum + b.duracion, 0) / backups.filter((b: any) => b.estado === 'COMPLETADO').length
     };
 
     return NextResponse.json({

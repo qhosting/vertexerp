@@ -141,13 +141,13 @@ export async function GET(request: NextRequest) {
     // Estadísticas generales
     const estadisticas = {
       totalServicios: sincronizaciones.length,
-      activos: sincronizaciones.filter(s => s.estado === 'ACTIVO').length,
-      pausados: sincronizaciones.filter(s => s.estado === 'PAUSADO').length,
-      conAdvertencias: sincronizaciones.filter(s => s.estado === 'ADVERTENCIA').length,
-      conErrores: sincronizaciones.filter(s => s.estado === 'ERROR').length,
-      totalErrores: sincronizaciones.reduce((sum, s) => sum + s.errores, 0),
+      activos: sincronizaciones.filter((s: any) => s.estado === 'ACTIVO').length,
+      pausados: sincronizaciones.filter((s: any) => s.estado === 'PAUSADO').length,
+      conAdvertencias: sincronizaciones.filter((s: any) => s.estado === 'ADVERTENCIA').length,
+      conErrores: sincronizaciones.filter((s: any) => s.estado === 'ERROR').length,
+      totalErrores: sincronizaciones.reduce((sum: number, s: any) => sum + s.errores, 0),
       ultimaActividad: Math.max(...sincronizaciones.map((s: any) => new Date(s.ultimaSincronizacion).getTime())),
-      registrosSincronizadosHoy: sincronizaciones.reduce((sum, s) => sum + s.registrosSincronizados, 0)
+      registrosSincronizadosHoy: sincronizaciones.reduce((sum: number, s: any) => sum + s.registrosSincronizados, 0)
     };
 
     return NextResponse.json({

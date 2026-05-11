@@ -61,13 +61,13 @@ export async function GET(request: NextRequest) {
 
       const resumen = {
         totalProductos: productos.length,
-        valorTotalCompra: valoracion.reduce((sum, p) => sum + p.valorInventarioCompra, 0),
-        valorTotalVenta: valoracion.reduce((sum, p) => sum + p.valorInventarioVenta, 0),
-        gananciaTeórica: valoracion.reduce((sum, p) => sum + p.gananciaTeórica, 0),
-        productosCriticos: valoracion.filter(p => p.estadoStock === 'CRITICO').length,
-        productosBajos: valoracion.filter(p => p.estadoStock === 'BAJO').length,
-        productosAltos: valoracion.filter(p => p.estadoStock === 'ALTO').length,
-        productosNormales: valoracion.filter(p => p.estadoStock === 'NORMAL').length,
+        valorTotalCompra: valoracion.reduce((sum: number, p: any) => sum + p.valorInventarioCompra, 0),
+        valorTotalVenta: valoracion.reduce((sum: number, p: any) => sum + p.valorInventarioVenta, 0),
+        gananciaTeórica: valoracion.reduce((sum: number, p: any) => sum + p.gananciaTeórica, 0),
+        productosCriticos: valoracion.filter((p: any) => p.estadoStock === 'CRITICO').length,
+        productosBajos: valoracion.filter((p: any) => p.estadoStock === 'BAJO').length,
+        productosAltos: valoracion.filter((p: any) => p.estadoStock === 'ALTO').length,
+        productosNormales: valoracion.filter((p: any) => p.estadoStock === 'NORMAL').length,
       };
 
       return NextResponse.json({
@@ -107,16 +107,16 @@ export async function GET(request: NextRequest) {
 
       const resumenMovimientos = {
         totalMovimientos: movimientos.length,
-        entradas: movimientos.filter(m => m.tipo === 'ENTRADA').length,
-        salidas: movimientos.filter(m => m.tipo === 'SALIDA').length,
-        ajustes: movimientos.filter(m => m.tipo === 'AJUSTE').length,
-        transferencias: movimientos.filter(m => m.tipo === 'TRANSFERENCIA').length,
+        entradas: movimientos.filter((m: any) => m.tipo === 'ENTRADA').length,
+        salidas: movimientos.filter((m: any) => m.tipo === 'SALIDA').length,
+        ajustes: movimientos.filter((m: any) => m.tipo === 'AJUSTE').length,
+        transferencias: movimientos.filter((m: any) => m.tipo === 'TRANSFERENCIA').length,
         cantidadTotalEntradas: movimientos
-          .filter(m => m.tipo === 'ENTRADA')
-          .reduce((sum, m) => sum + m.cantidad, 0),
+          .filter((m: any) => m.tipo === 'ENTRADA')
+          .reduce((sum: number, m: any) => sum + m.cantidad, 0),
         cantidadTotalSalidas: movimientos
-          .filter(m => m.tipo === 'SALIDA')
-          .reduce((sum, m) => sum + m.cantidad, 0),
+          .filter((m: any) => m.tipo === 'SALIDA')
+          .reduce((sum: number, m: any) => sum + m.cantidad, 0),
       };
 
       // Movimientos por producto
@@ -171,12 +171,12 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    const stockCritico = productos.filter(p => p.stock <= p.stockMinimo);
-    const stockBajo = productos.filter(p => 
+    const stockCritico = productos.filter((p: any) => p.stock <= p.stockMinimo);
+    const stockBajo = productos.filter((p: any) => 
       p.stock > p.stockMinimo && p.stock <= p.stockMinimo * 1.5
     );
-    const stockAlto = productos.filter(p => p.stock >= p.stockMaximo * 0.8);
-    const stockNormal = productos.filter(p => 
+    const stockAlto = productos.filter((p: any) => p.stock >= p.stockMaximo * 0.8);
+    const stockNormal = productos.filter((p: any) => 
       p.stock > p.stockMinimo * 1.5 && p.stock < p.stockMaximo * 0.8
     );
 
@@ -186,7 +186,7 @@ export async function GET(request: NextRequest) {
       stockBajo: stockBajo.length,
       stockAlto: stockAlto.length,
       stockNormal: stockNormal.length,
-      valorTotalInventario: productos.reduce((sum, p) => sum + (p.stock * p.precioCompra), 0),
+      valorTotalInventario: productos.reduce((sum: number, p: any) => sum + (p.stock * p.precioCompra), 0),
     };
 
     if (formato === 'csv') {
