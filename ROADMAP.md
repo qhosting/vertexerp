@@ -21,6 +21,7 @@ VertexERP es un **Sistema de Planificación de Recursos Empresariales (ERP)** co
 - [x] **Gestión de Dependencias Robusta**: Sistema de backup para `yarn.lock` y prevención de errores de checksum.
 - [x] **Base de Datos Normalizada**: 25+ modelos en PostgreSQL con Prisma ORM.
 - [x] **Seguridad y Auditoría**: Autenticación NextAuth.js, RBAC y sistema de AuditLog completo.
+- [x] **Arquitectura Modular (Addons/Plugins)**: Cimientos Core base aislados con sistema de registro, dependencias y habilitación dinámica para 10+ módulos opcionales.
 
 ### 💼 Módulos de Negocio y Funcionalidades
 - [x] **Gestión de Clientes (CRM)**: Perfil detallado de clientes con historial de crédito, referencias, información laboral, aval/co-signer y geolocalización (coordenadas GPS) para cobro en campo.
@@ -82,6 +83,10 @@ VertexERP es un **Sistema de Planificación de Recursos Empresariales (ERP)** co
 | | - Creación de empaque Desktop nativo mediante Electron y precargas | |
 | | - Integración nativa móvil para iOS & Android usando Capacitor wrappers | |
 | | - Creación de scripts de empaquetado multiplataforma en `package.json` | |
+| 2026-05-18 | **Arquitectura de Módulos y Addons Dinámicos** | ✅ |
+| | - Creación de AddonManager para registro y activación dinámica de plugins | |
+| | - Estructuración modular de 10+ módulos (CRM, Inventario, SAT, GPS) | |
+| | - Implementación de dependencias lógicas y control de accesos RBAC | |
 
 ---
 **Responsable**: Lead Architect & DevOps  
