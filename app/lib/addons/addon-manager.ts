@@ -146,6 +146,31 @@ export const ADDONS_REGISTRY: Addon[] = [
     isCore: false,
     dependencies: ['pagares-moratorios'],
     path: '/dashboard'
+  },
+  // ============= SME COMMERCIALIZATION & ECOMMERCE ADDONS =============
+  {
+    id: 'comercializacion-pos',
+    name: 'Punto de Venta (POS - Pymes Comercialización)',
+    version: '1.0.0',
+    description: 'Venta rápida en caja, soporte para escáner de códigos de barras, arqueos/cortes de caja diarios e integración con impresoras térmicas de tickets.',
+    category: 'BUSINESS',
+    requiredRole: ['SUPERADMIN', 'ADMIN', 'VENTAS'],
+    icon: 'Store',
+    isCore: false,
+    dependencies: ['inventario-compras'],
+    path: '/punto-de-venta'
+  },
+  {
+    id: 'ecommerce-store',
+    name: 'E-commerce Integrado',
+    version: '1.0.0',
+    description: 'Tienda en línea sincronizada en tiempo real con el stock del almacén del ERP y pasarelas de pago (Stripe/PayPal), con recepción automatizada de pedidos.',
+    category: 'BUSINESS',
+    requiredRole: ['SUPERADMIN', 'ADMIN', 'VENTAS'],
+    icon: 'Globe',
+    isCore: false,
+    dependencies: ['inventario-compras', 'pedidos-ventas'],
+    path: '/ecommerce'
   }
 ];
 
