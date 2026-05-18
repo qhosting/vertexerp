@@ -171,6 +171,18 @@ export const ADDONS_REGISTRY: Addon[] = [
     isCore: false,
     dependencies: ['inventario-compras', 'pedidos-ventas'],
     path: '/ecommerce'
+  },
+  {
+    id: 'presupuestos-cotizaciones',
+    name: 'Cotizaciones y Presupuestos',
+    version: '1.0.0',
+    description: 'Generación de propuestas comerciales y cotizaciones con fecha de expiración, personalización de descuentos e IVA, y conversión directa a Pedido o Venta con un solo clic.',
+    category: 'BUSINESS',
+    requiredRole: ['SUPERADMIN', 'ADMIN', 'VENTAS'],
+    icon: 'FileHeart',
+    isCore: false,
+    dependencies: ['crm-clientes', 'inventario-compras'],
+    path: '/cotizaciones'
   }
 ];
 
