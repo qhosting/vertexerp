@@ -35,4 +35,11 @@ echo "✅ Prisma Client generado"
 
 # Iniciar la aplicación
 echo "🎉 Iniciando aplicación en puerto ${PORT:-3000}..."
-node server.js
+if [ -f "server.js" ]; then
+  node server.js
+elif [ -f "app/server.js" ]; then
+  node app/server.js
+else
+  echo "❌ ERROR: No se pudo encontrar server.js en el contenedor"
+  exit 1
+fi
