@@ -17,9 +17,9 @@ echo "✅ Variables de entorno verificadas"
 
 # Ejecutar migraciones de Prisma
 echo "📦 Aplicando migraciones de base de datos..."
-npx prisma migrate deploy || {
+npx prisma@6.7.0 migrate deploy || {
   echo "⚠️  Migraciones fallaron, intentando push..."
-  npx prisma db push --accept-data-loss || {
+  npx prisma@6.7.0 db push --accept-data-loss || {
     echo "❌ ERROR: No se pudo sincronizar la base de datos"
     exit 1
   }
@@ -29,7 +29,7 @@ echo "✅ Base de datos sincronizada"
 
 # Generar Prisma Client (por si acaso)
 echo "🔧 Generando Prisma Client..."
-npx prisma generate
+npx prisma@6.7.0 generate
 
 echo "✅ Prisma Client generado"
 
