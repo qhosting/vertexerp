@@ -172,13 +172,13 @@ export async function GET(request: NextRequest) {
         interesesNuevos: Math.max(0, interesesNuevos),
         montoTotal: montoVencido + interesesCalculados
       }
-    }).filter(item => item.interesesNuevos > 0)
+    }).filter((item: any) => item.interesesNuevos > 0)
 
     const resumen = {
       totalPagares: preview.length,
-      totalInteresesNuevos: preview.reduce((sum, item) => sum + item.interesesNuevos, 0),
-      totalInteresesCalculados: preview.reduce((sum, item) => sum + item.interesesCalculados, 0),
-      totalMontoVencido: preview.reduce((sum, item) => sum + item.montoVencido, 0)
+      totalInteresesNuevos: preview.reduce((sum: number, item: any) => sum + item.interesesNuevos, 0),
+      totalInteresesCalculados: preview.reduce((sum: number, item: any) => sum + item.interesesCalculados, 0),
+      totalMontoVencido: preview.reduce((sum: number, item: any) => sum + item.montoVencido, 0)
     }
 
     return NextResponse.json({

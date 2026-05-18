@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
 
     const marcasLimpias = marcas
       .map((p: any) => p.marca)
-      .filter(marca => marca !== null && marca.trim() !== '')
+      .filter((marca: any) => marca !== null && marca.trim() !== '')
       .sort();
 
     return NextResponse.json({ marcas: marcasLimpias });

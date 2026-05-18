@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
 
     const categoriasLimpias = categorias
       .map((p: any) => p.categoria)
-      .filter(cat => cat !== null && cat.trim() !== '')
+      .filter((cat: any) => cat !== null && cat.trim() !== '')
       .sort();
 
     return NextResponse.json({ categorias: categoriasLimpias });
