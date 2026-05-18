@@ -95,6 +95,13 @@ export async function GET(request: NextRequest) {
       aval: cliente.aval,
       limite_credito: cliente.limiteCredito,
       
+      // Campos fiscales (CFDI 4.0)
+      rfc: cliente.rfc,
+      razonSocial: cliente.razonSocial,
+      regimenFiscal: cliente.regimenFiscal,
+      usoCfdi: cliente.usoCfdi,
+      codigoPostalFiscal: cliente.codigoPostalFiscal,
+      
       // Campos adicionales para la web
       createdAt: cliente.fechaAlta,
       updatedAt: cliente.ultimaActualizacion

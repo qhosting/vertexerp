@@ -125,6 +125,13 @@ model Cliente {
   telefono3         String?   // tel3_cliente
   email             String?
   
+  // Información fiscal (CFDI 4.0)
+  rfc               String?   // rfc_cliente
+  razonSocial       String?   // razon_social
+  regimenFiscal     String?   // regimen_fiscal (e.g., 601, 605, 626)
+  usoCfdi           String?   // uso_cfdi (e.g., G03, CP01, S01)
+  codigoPostalFiscal String?  // cp_fiscal
+  
   // Dirección
   calle             String?   // calle_dom
   numeroExterior    String?   // exterior_dom

@@ -110,6 +110,11 @@ export async function PUT(
       diaCobro,
       gestorId,
       vendedorId,
+      rfc,
+      razonSocial,
+      regimenFiscal,
+      usoCfdi,
+      codigoPostalFiscal,
       ...rest
     } = body;
 
@@ -162,6 +167,11 @@ export async function PUT(
         telefono1: telefono1?.trim(),
         telefono2: telefono2?.trim() || null,
         email: email?.trim() || null,
+        rfc: rfc?.trim() || null,
+        razonSocial: razonSocial?.trim() || null,
+        regimenFiscal: regimenFiscal?.trim() || null,
+        usoCfdi: usoCfdi?.trim() || null,
+        codigoPostalFiscal: codigoPostalFiscal?.trim() || null,
         municipio: municipio?.trim() || null,
         estado: estado?.trim() || null,
         colonia: colonia?.trim() || null,

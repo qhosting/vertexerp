@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -16,7 +15,8 @@ import {
   MapPin, 
   CreditCard,
   Save,
-  X
+  X,
+  Building
 } from 'lucide-react';
 
 interface ClienteFormModalProps {
@@ -32,6 +32,11 @@ interface ClienteForm {
   telefono1: string;
   telefono2: string;
   email: string;
+  rfc: string;
+  razonSocial: string;
+  regimenFiscal: string;
+  usoCfdi: string;
+  codigoPostalFiscal: string;
   municipio: string;
   estado: string;
   colonia: string;
@@ -55,12 +60,44 @@ interface UserOption {
   role: string;
 }
 
+// Catálogos SAT para CFDI 4.0
+const regimenesFiscales = [
+  { code: '601', description: 'General de Ley Personas Morales' },
+  { code: '603', description: 'Personas Morales con Fines no Lucrativos' },
+  { code: '605', description: 'Sueldos y Salarios e Ingresos Asimilados a Salarios' },
+  { code: '606', description: 'Arrendamiento' },
+  { code: '612', description: 'Personas Físicas con Actividades Empresariales y Profesionales' },
+  { code: '616', description: 'Sin obligaciones fiscales' },
+  { code: '621', description: 'Incorporación Fiscal' },
+  { code: '625', description: 'Actividades Agrícolas, Ganaderas, Silvícolas y Pesqueras' },
+  { code: '626', description: 'Régimen Simplificado de Confianza (RESICO)' },
+];
+
+const usosCfdi = [
+  { code: 'G01', description: 'Adquisición de mercancías' },
+  { code: 'G02', description: 'Devoluciones, descuentos o bonificaciones' },
+  { code: 'G03', description: 'Gastos en general' },
+  { code: 'I01', description: 'Construcciones' },
+  { code: 'I02', description: 'Mobiliario y equipo de oficina por inversiones' },
+  { code: 'I04', description: 'Equipo de transporte' },
+  { code: 'I08', description: 'Otra maquinaria y equipo' },
+  { code: 'D01', description: 'Honorarios médicos, dentales y gastos hospitalarios' },
+  { code: 'D02', description: 'Gastos médicos por incapacidad o discapacidad' },
+  { code: 'CP01', description: 'Pagos (Complemento de Pago)' },
+  { code: 'S01', description: 'Sin efectos fiscales' },
+];
+
 const initialForm: ClienteForm = {
   codigoCliente: '',
   nombre: '',
   telefono1: '',
   telefono2: '',
   email: '',
+  rfc: '',
+  razonSocial: '',
+  regimenFiscal: '',
+  usoCfdi: '',
+  codigoPostalFiscal: '',
   municipio: '',
   estado: '',
   colonia: '',
@@ -135,6 +172,11 @@ export function ClienteFormModal({ isOpen, onClose, clienteId, onSuccess }: Clie
           telefono1: cliente.telefono1 || '',
           telefono2: cliente.telefono2 || '',
           email: cliente.email || '',
+          rfc: cliente.rfc || '',
+          razonSocial: cliente.razonSocial || '',
+          regimenFiscal: cliente.regimenFiscal || '',
+          usoCfdi: cliente.usoCfdi || '',
+          codigoPostalFiscal: cliente.codigoPostalFiscal || '',
           municipio: cliente.municipio || '',
           estado: cliente.estado || '',
           colonia: cliente.colonia || '',
@@ -197,7 +239,13 @@ export function ClienteFormModal({ isOpen, onClose, clienteId, onSuccess }: Clie
   };
 
   const handleChange = (field: keyof ClienteForm, value: string) => {
-    setForm(prev => ({ ...prev, [field]: value }));
+    // Si es RFC, forzar mayúsculas y limitar a 13 caracteres
+    if (field === 'rfc') {
+      const cleanRfc = value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 13);
+      setForm(prev => ({ ...prev, [field]: cleanRfc }));
+    } else {
+      setForm(prev => ({ ...prev, [field]: value }));
+    }
   };
 
   if (!isOpen) return null;
@@ -222,13 +270,14 @@ export function ClienteFormModal({ isOpen, onClose, clienteId, onSuccess }: Clie
         ) : (
           <form onSubmit={handleSubmit}>
             <Tabs defaultValue="general" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
+              <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="general">General</TabsTrigger>
                 <TabsTrigger value="direccion">Dirección</TabsTrigger>
                 <TabsTrigger value="financiero">Financiero</TabsTrigger>
+                <TabsTrigger value="fiscal" className="text-emerald-600 font-bold dark:text-emerald-400">Perfil Fiscal (CFDI)</TabsTrigger>
               </TabsList>
 
-              <TabsContent value="general" className="space-y-4">
+              <TabsContent value="general" className="space-y-4 pt-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="codigoCliente">Código Cliente *</Label>
@@ -336,7 +385,7 @@ export function ClienteFormModal({ isOpen, onClose, clienteId, onSuccess }: Clie
                 </div>
               </TabsContent>
 
-              <TabsContent value="direccion" className="space-y-4">
+              <TabsContent value="direccion" className="space-y-4 pt-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="calle">Calle</Label>
@@ -410,7 +459,7 @@ export function ClienteFormModal({ isOpen, onClose, clienteId, onSuccess }: Clie
                 </div>
               </TabsContent>
 
-              <TabsContent value="financiero" className="space-y-4">
+              <TabsContent value="financiero" className="space-y-4 pt-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="pagosPeriodicos">Pago Periódico *</Label>
@@ -470,13 +519,99 @@ export function ClienteFormModal({ isOpen, onClose, clienteId, onSuccess }: Clie
                   </div>
                 </div>
               </TabsContent>
+
+              {/* TABS FISCAL - CFDI 4.0 */}
+              <TabsContent value="fiscal" className="space-y-4 pt-4">
+                <div className="p-4 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30 rounded-lg flex items-start gap-3">
+                  <Building className="h-5 w-5 text-emerald-600 dark:text-emerald-400 mt-0.5" />
+                  <div className="space-y-1">
+                    <p className="text-sm font-semibold text-emerald-950 dark:text-emerald-200">Requerimientos CFDI 4.0 (México)</p>
+                    <p className="text-xs text-emerald-800 dark:text-emerald-400">
+                      Para emitir facturas electrónicas, el <strong>RFC</strong>, <strong>Razón Social</strong> y <strong>Código Postal Fiscal</strong> deben coincidir exactamente con la Cédula de Identificación Fiscal (CIF) del SAT del contribuyente (respetando mayúsculas, sin régimen societario como S.A. de C.V.).
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="rfc" className="flex items-center gap-1">
+                      RFC
+                    </Label>
+                    <Input
+                      id="rfc"
+                      value={form.rfc}
+                      onChange={(e) => handleChange('rfc', e.target.value)}
+                      placeholder="XAXX010101000"
+                      maxLength={13}
+                      className="font-mono uppercase tracking-wider"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="razonSocial">Razón Social (SAT)</Label>
+                    <Input
+                      id="razonSocial"
+                      value={form.razonSocial}
+                      onChange={(e) => handleChange('razonSocial', e.target.value)}
+                      placeholder="NOMBRE O RAZON SOCIAL EXACTA"
+                      className="uppercase"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="regimenFiscal">Régimen Fiscal (SAT)</Label>
+                    <Select value={form.regimenFiscal || "sin-regimen"} onValueChange={(value) => handleChange('regimenFiscal', value === 'sin-regimen' ? '' : value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Seleccionar régimen fiscal..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="sin-regimen">Sin régimen fiscal asignado</SelectItem>
+                        {regimenesFiscales.map((reg) => (
+                          <SelectItem key={reg.code} value={reg.code}>
+                            {reg.code} - {reg.description}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="usoCfdi">Uso de CFDI (SAT)</Label>
+                    <Select value={form.usoCfdi || "sin-uso"} onValueChange={(value) => handleChange('usoCfdi', value === 'sin-uso' ? '' : value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Seleccionar uso de CFDI..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="sin-uso">Sin uso asignado</SelectItem>
+                        {usosCfdi.map((uso) => (
+                          <SelectItem key={uso.code} value={uso.code}>
+                            {uso.code} - {uso.description}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="codigoPostalFiscal">Código Postal Fiscal</Label>
+                    <Input
+                      id="codigoPostalFiscal"
+                      value={form.codigoPostalFiscal}
+                      onChange={(e) => handleChange('codigoPostalFiscal', e.target.value)}
+                      placeholder="Mismo de la constancia fiscal"
+                      maxLength={5}
+                      className="font-mono"
+                    />
+                  </div>
+                </div>
+              </TabsContent>
             </Tabs>
 
-            <div className="flex justify-end gap-2 pt-4">
+            <div className="flex justify-end gap-2 pt-6 border-t mt-6">
               <Button type="button" variant="outline" onClick={onClose}>
                 Cancelar
               </Button>
-              <Button type="submit" disabled={saving}>
+              <Button type="submit" disabled={saving} className="bg-emerald-600 hover:bg-emerald-700 text-white">
                 {saving ? (
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                 ) : (
@@ -491,3 +626,5 @@ export function ClienteFormModal({ isOpen, onClose, clienteId, onSuccess }: Clie
     </Dialog>
   );
 }
+
+export default ClienteFormModal;
