@@ -39,6 +39,7 @@ VertexERP es un **Sistema de Planificación de Recursos Empresariales (ERP)** co
 - [x] **Cobranza Móvil y Pagos**: Registro de abonos distribuidos automáticamente en capital/intereses, registro de métodos de pago (efectivo, tarjeta, transferencia, cheque), geolocalización GPS satelital de la cobranza y validación de seguridad por IMEI del dispositivo.
 - [x] **Punto de Venta (POS Pymes Comercialización)**: Venta rápida por caja, soporte de escáner de barras, arqueos/apertura/cortes de caja y tickets de impresora térmica.
 - [x] **E-commerce Sincronizado**: Tienda online sincronizada con stock e inyección automatizada de pedidos al ERP con pasarelas de pago.
+- [x] **Facturación Electrónica SAT (CFDI 4.0 - Contpaqi API)**: Adaptado para el marco fiscal mexicano, timbrado oficial directo de facturas, inyección de catálogos y emisión automática de Recibos Electrónicos de Pago (REP) vía el SDK de Contpaqi Comercial Premium local en el servidor.
 - [x] **Compras y Cuentas por Pagar (CXP)**: Gestión integrada de proveedores, órdenes de compra y control de vencimientos de pasivos.
 - [x] **Soporte Multiplataforma Novedoso**: Integración de capacidades nativas e instalables:
   * **PWA (Progressive Web App):** Caché inteligente offline, manifiesto y banners de instalación nativa para móviles y PC.
@@ -103,6 +104,10 @@ VertexERP es un **Sistema de Planificación de Recursos Empresariales (ERP)** co
 | | - Creación del conector waha-api.ts para automatizar avisos de cobro y cotizaciones | |
 | | - Formateo de números telefónicos a estándar JID (@c.us) en base a especificación | |
 | | - Soporte para envío de texto y archivos multimedia (invoices/PDFs) con QR Status | |
+| 2026-05-18 | **Facturación y Timbrado SAT vía Contpaqi API** | ✅ |
+| | - Creación del conector contpaqi.ts con soporte para tokens de seguridad y Multi-Empresa | |
+| | - Endpoint /api/facturacion/timbrar con mapeo dinámico a CFDI 4.0 (PUE/PPD y Uso CFDI) | |
+| | - Sincronización automática de abonos a Recibos Electrónicos de Pago (REP) en base de datos | |
 
 ---
 **Responsable**: Lead Architect & DevOps  
