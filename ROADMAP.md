@@ -22,15 +22,23 @@ VertexERP es un **Sistema de Planificación de Recursos Empresariales (ERP)** co
 - [x] **Base de Datos Normalizada**: 25+ modelos en PostgreSQL con Prisma ORM.
 - [x] **Seguridad y Auditoría**: Autenticación NextAuth.js, RBAC y sistema de AuditLog completo.
 
-### 💼 Módulos de Negocio
-- [x] **Gestión de Clientes**: CRM completo con historial crediticio y geolocalización.
-- [x] **Inventario y Ventas**: Catálogo con niveles de precios, control de stock y proceso de venta automatizado.
-- [x] **Cobranza y Finanzas**: Generación de pagarés, cálculo de intereses moratorios y gestión de cobranza móvil offline.
-- [x] **Facturación y Compras**: Integración con PACs (México CFDI) y gestión completa de proveedores.
+### 💼 Módulos de Negocio y Funcionalidades
+- [x] **Gestión de Clientes (CRM)**: Perfil detallado de clientes con historial de crédito, referencias, información laboral, aval/co-signer y geolocalización (coordenadas GPS) para cobro en campo.
+- [x] **Catálogo e Inventario Dinámico**: Gestión de productos con 5 niveles de precios configurables, stock de máximos/mínimos, ubicación en almacén (pasillos/estantes), lote, caducidades e imágenes múltiples.
+- [x] **Movimientos de Inventario**: Bitácora y control de stock mediante movimientos clasificados (Entrada, Salida, Ajuste y Transferencia) con control de usuarios.
+- [x] **Módulo de Pedidos**: Creación, seguimiento y cancelación de pedidos con prioridades y conversión directa a ventas facturadas.
+- [x] **Ventas y Créditos Amortizados**: Emisión de facturas y ventas con enganche/pago inicial, periodicidad de pago configurable (semanal, quincenal, mensual), plazos, días de gracia y control de garantías de producto.
+- [x] **Sistema de Pagarés Automáticos**: División automática de saldos de ventas en pagarés estructurados y calendarizados con estatus de control (Pendiente, Parcial, Vencido, Pagado, Cancelado).
+- [x] **Cálculo de Intereses Moratorios**: Sistema masivo automatizado para cálculo diario de morosidad basado en días vencidos y tasas configuradas.
+- [x] **Notas de Crédito y Cargo**: Emisión de notas de cargo para deudas adicionales y notas de crédito para devoluciones con reingreso automático al stock.
+- [x] **Reestructuras de Crédito**: Módulo para refinanciamiento de deudas vigentes, condonación de intereses moratorios, descuentos y flujo de autorización por roles administrativos.
+- [x] **Gestión de Garantías**: Registro de fallas, diagnósticos técnicos, seguimiento de reparaciones, reemplazos de unidades y su impacto en almacén.
+- [x] **Cobranza Móvil y Pagos**: Registro de abonos distribuidos automáticamente en capital/intereses, registro de métodos de pago (efectivo, tarjeta, transferencia, cheque), geolocalización GPS satelital de la cobranza y validación de seguridad por IMEI del dispositivo.
+- [x] **Compras y Cuentas por Pagar (CXP)**: Gestión integrada de proveedores, órdenes de compra y control de vencimientos de pasivos.
 
 ### 🤖 Inteligencia Artificial y Reportes
 - [x] **Business Intelligence**: Dashboards ejecutivos con predicciones mediante Abacus.AI.
-- [x] **Reportes Avanzados**: Visualizaciones interactivas con Recharts y Plotly.
+- [x] **Reportes Avanzados**: Visualizaciones interactivas de ventas, inventario y cobranza con Recharts y Plotly.
 
 ---
 
@@ -62,6 +70,11 @@ VertexERP es un **Sistema de Planificación de Recursos Empresariales (ERP)** co
 | | - Fix crítico de `yarn.lock` | |
 | | - Optimización de Docker Context | |
 | | - Limpieza de Documentación Redundante | |
+| 2026-05-18 | **Resolución de Errores de Tipado Estricto (Docker Build)** | ✅ |
+| | - Fix de 'implicit any' en `every()` de aplicar-pago | |
+| | - Fix de 'implicit any' en `filter()` y `reduce()` de calcular-intereses | |
+| | - Fix de 'implicit any' en `map()` en listado general de pagarés | |
+| | - Fortalecimiento preventivo de tipos en marcas y categorías de productos | |
 
 ---
 **Responsable**: Lead Architect & DevOps  
