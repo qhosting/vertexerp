@@ -51,7 +51,6 @@ export default function SignIn() {
           <CardTitle className="text-2xl font-bold text-gray-900">
             Iniciar Sesión
           </CardTitle>
-          <p className="text-gray-600">Sistema ERP Completo</p>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -95,14 +94,6 @@ export default function SignIn() {
               {isLoading ? 'Iniciando...' : 'Iniciar Sesión'}
             </Button>
           </form>
-          
-          <Separator className="my-6" />
-          
-          <div className="text-center text-sm text-gray-600">
-            <p>Credenciales de prueba:</p>
-            <p><strong>Email:</strong> admin@sistema.com</p>
-            <p><strong>Contraseña:</strong> 123456</p>
-          </div>
         </CardContent>
       </Card>
     </div>
