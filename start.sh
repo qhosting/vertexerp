@@ -15,11 +15,11 @@ fi
 
 echo "✅ Variables de entorno verificadas"
 
-# Ejecutar migraciones de Prisma
-echo "📦 Aplicando migraciones de base de datos..."
-npx prisma@6.7.0 migrate deploy || {
-  echo "⚠️  Migraciones fallaron, intentando push..."
-  npx prisma@6.7.0 db push --accept-data-loss || {
+# Sincronizar base de datos
+echo "📦 Sincronizando base de datos..."
+npx prisma@6.7.0 db push --accept-data-loss || {
+  echo "⚠️  db push falló, intentando migrate deploy..."
+  npx prisma@6.7.0 migrate deploy || {
     echo "❌ ERROR: No se pudo sincronizar la base de datos"
     exit 1
   }
