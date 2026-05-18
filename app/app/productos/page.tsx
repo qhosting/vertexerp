@@ -30,7 +30,7 @@ import {
   Upload
 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { RolePermissions } from '@/lib/types';
+import { RolePermissions, UserRole } from '@/lib/types';
 import { ProductForm } from '@/components/productos/product-form';
 import { ProductDetails } from '@/components/productos/product-details';
 import { ProductFilters } from '@/components/productos/product-filters';
@@ -85,8 +85,8 @@ export default function ProductosPage() {
   const [categorias, setCategorias] = useState<string[]>([]);
   const [marcas, setMarcas] = useState<string[]>([]);
 
-  const userRole = session?.user?.role;
-  const permissions = userRole ? RolePermissions[userRole] : {};
+  const userRole = session?.user?.role as UserRole;
+  const permissions = userRole ? RolePermissions[userRole] : {} as any;
 
   useEffect(() => {
     fetchProductos();

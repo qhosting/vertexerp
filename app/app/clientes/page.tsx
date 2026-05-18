@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { RolePermissions } from '@/lib/types';
+import { RolePermissions, UserRole } from '@/lib/types';
 import { ClienteDetailModal } from '@/components/clientes/cliente-detail-modal';
 import { ClienteFormModal } from '@/components/clientes/cliente-form-modal';
 import { ClienteImportModal } from '@/components/clientes/cliente-import-modal';
@@ -68,7 +68,7 @@ export default function ClientesPage() {
   const [editingClienteId, setEditingClienteId] = useState<string | null>(null);
   const [comunicacionCliente, setComunicacionCliente] = useState<Cliente | null>(null);
 
-  const userRole = session?.user?.role;
+  const userRole = session?.user?.role as UserRole;
   const permissions = userRole ? RolePermissions[userRole] : null;
   const canCreate = permissions?.clientes?.create === true;
   const canUpdate = permissions?.clientes?.update === true;
