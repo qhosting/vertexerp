@@ -35,6 +35,8 @@ VertexERP es un **Sistema de Planificación de Recursos Empresariales (ERP)** co
 - [x] **Reestructuras de Crédito**: Módulo para refinanciamiento de deudas vigentes, condonación de intereses moratorios, descuentos y flujo de autorización por roles administrativos.
 - [x] **Gestión de Garantías**: Registro de fallas, diagnósticos técnicos, seguimiento de reparaciones, reemplazos de unidades y su impacto en almacén.
 - [x] **Cobranza Móvil y Pagos**: Registro de abonos distribuidos automáticamente en capital/intereses, registro de métodos de pago (efectivo, tarjeta, transferencia, cheque), geolocalización GPS satelital de la cobranza y validación de seguridad por IMEI del dispositivo.
+- [x] **Punto de Venta (POS Pymes Comercialización)**: Venta rápida por caja, soporte de escáner de barras, arqueos/apertura/cortes de caja y tickets de impresora térmica.
+- [x] **E-commerce Sincronizado**: Tienda online sincronizada con stock e inyección automatizada de pedidos al ERP con pasarelas de pago.
 - [x] **Compras y Cuentas por Pagar (CXP)**: Gestión integrada de proveedores, órdenes de compra y control de vencimientos de pasivos.
 - [x] **Soporte Multiplataforma Novedoso**: Integración de capacidades nativas e instalables:
   * **PWA (Progressive Web App):** Caché inteligente offline, manifiesto y banners de instalación nativa para móviles y PC.
@@ -87,6 +89,10 @@ VertexERP es un **Sistema de Planificación de Recursos Empresariales (ERP)** co
 | | - Creación de AddonManager para registro y activación dinámica de plugins | |
 | | - Estructuración modular de 10+ módulos (CRM, Inventario, SAT, GPS) | |
 | | - Implementación de dependencias lógicas y control de accesos RBAC | |
+| 2026-05-18 | **Soporte para Pymes de Comercialización y E-commerce** | ✅ |
+| | - Registro e integración del módulo POS (Punto de Venta) y arqueo de caja | |
+| | - Creación del módulo E-commerce con inyección automática de pedidos | |
+| | - Acoplamiento de stock en tiempo real y flujos financieros integrados | |
 
 ---
 **Responsable**: Lead Architect & DevOps  
