@@ -183,6 +183,17 @@ export const ADDONS_REGISTRY: Addon[] = [
     isCore: false,
     dependencies: ['crm-clientes', 'inventario-compras'],
     path: '/cotizaciones'
+  },
+  {
+    id: 'landing-page-webuilder',
+    name: 'Sitio Web Corporativo y Landing Page',
+    version: '1.0.0',
+    description: 'Habilita un sitio web de presentación pública para la empresa con catálogo de productos y botón de acceso al ERP.',
+    category: 'SUPPORT',
+    requiredRole: ['SUPERADMIN', 'ADMIN'],
+    icon: 'Globe',
+    isCore: false,
+    path: '/'
   }
 ];
 
