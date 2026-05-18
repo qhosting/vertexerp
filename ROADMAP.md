@@ -22,7 +22,7 @@ VertexERP es un **Sistema de Planificación de Recursos Empresariales (ERP)** co
 - [x] **Base de Datos Normalizada**: 25+ modelos en PostgreSQL con Prisma ORM.
 - [x] **Seguridad y Auditoría**: Autenticación NextAuth.js, RBAC y sistema de AuditLog completo.
 - [x] **Arquitectura Modular (Addons/Plugins)**: Cimientos Core base aislados con sistema de registro, dependencias y habilitación dinámica para 10+ módulos opcionales.
-- [x] **Integraciones de Mensajería Omnicanal**: Conectores nativos estandarizados para envío automatizado de notificaciones por WhatsApp (WAHA API y Evolution API) y pasarelas de SMS (LabsMobile) para notificar cobros y emitir cotizaciones.
+- [x] **Integraciones de Mensajería Omnicanal**: Conectores nativos estandarizados para envío automatizado de notificaciones por WhatsApp (WAHA API) y pasarelas de SMS (LabsMobile) para notificar cobros y emitir cotizaciones.
 
 ### 💼 Módulos de Negocio y Funcionalidades
 - [x] **Gestión de Clientes (CRM)**: Perfil detallado de clientes con historial de crédito, referencias, información laboral, aval/co-signer y geolocalización (coordenadas GPS) para cobro en campo.
