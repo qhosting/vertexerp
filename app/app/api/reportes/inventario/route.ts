@@ -120,7 +120,7 @@ export async function GET(request: NextRequest) {
       };
 
       // Movimientos por producto
-      const movimientosPorProducto = movimientos.reduce((acc: any, mov) => {
+      const movimientosPorProducto = movimientos.reduce((acc: any, mov: any) => {
         const producto = mov.producto.codigo + ' - ' + mov.producto.nombre;
         if (!acc[producto]) {
           acc[producto] = {
