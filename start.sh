@@ -37,14 +37,12 @@ echo "✅ Prisma Client generado"
 echo "👤 Creando o actualizando usuario administrador root..."
 cat << 'EOF' > /app/app/create-root-user.js
 const { PrismaClient } = require('@prisma/client');
-const bcrypt = require('bcryptjs');
 
 const prisma = new PrismaClient();
 
 async function main() {
   const email = 'root@aurumcapital.mx';
-  const password = 'x0420EZS#';
-  const hashedPassword = await bcrypt.hash(password, 12);
+  const hashedPassword = '$2a$12$G.Aic616iqXHxwn2unWxu.BGjB/OFKPxNqmg.9TnuILyoAUS4uKNq';
 
   console.log(`Creating or updating user ${email}...`);
 
@@ -67,7 +65,7 @@ async function main() {
   });
 
   console.log('✅ User successfully created/updated:');
-  console.log(user);
+  console.log(user.email);
 }
 
 main()
