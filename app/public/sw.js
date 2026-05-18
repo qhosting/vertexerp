@@ -1,132 +1,78 @@
+const CACHE_NAME = 'vertexerp-cache-v1';
 
-// Service Worker para funcionalidad offline
-const CACHE_NAME = 'erp-cobranza-v1';
-const urlsToCache = [
+const ASSETS_TO_CACHE = [
   '/',
-  '/cobranza',
-  '/static/js/bundle.js',
-  '/static/css/main.css',
-  '/manifest.json'
+  '/manifest.json',
+  '/icons/PWA-192.png',
+  '/icons/PWA-512.png',
 ];
 
-// Instalación del service worker
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('Cache abierto');
-        return cache.addAll(urlsToCache);
-      })
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(ASSETS_TO_CACHE);
+    })
   );
+  self.skipWaiting();
 });
 
-// Interceptar peticiones de red
-self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        // Devolver del cache si existe
-        if (response) {
-          return response;
-        }
-
-        return fetch(event.request).then(
-          (response) => {
-            // Verificar que la respuesta sea válida
-            if (!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
-            }
-
-            // Clonar la respuesta
-            const responseToCache = response.clone();
-
-            caches.open(CACHE_NAME)
-              .then((cache) => {
-                cache.put(event.request, responseToCache);
-              });
-
-            return response;
-          }
-        ).catch(() => {
-          // Si falla la red y no está en cache, mostrar página offline
-          if (event.request.destination === 'document') {
-            return caches.match('/offline.html');
-          }
-        });
-      })
-  );
-});
-
-// Actualización del service worker
 self.addEventListener('activate', (event) => {
-  const cacheWhitelist = [CACHE_NAME];
-
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
-          if (cacheWhitelist.indexOf(cacheName) === -1) {
+          if (cacheName !== CACHE_NAME) {
             return caches.delete(cacheName);
           }
         })
       );
     })
   );
+  self.clients.claim();
 });
 
-// Manejar mensajes del cliente
-self.addEventListener('message', (event) => {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
+self.addEventListener('fetch', (event) => {
+  // Only intercept GET requests of the same origin
+  if (event.request.method !== 'GET' || !event.request.url.startsWith(self.location.origin)) {
+    return;
   }
-});
 
-// Sincronización en segundo plano
-self.addEventListener('sync', (event) => {
-  if (event.tag === 'sync-pagos') {
-    event.waitUntil(syncPagos());
+  // API and Auth routes should always hit the network directly and not cache
+  if (event.request.url.includes('/api/') || event.request.url.includes('/auth/')) {
+    event.respondWith(
+      fetch(event.request).catch(() => {
+        return new Response(JSON.stringify({ error: 'Modo Offline Activo' }), {
+          status: 503,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      })
+    );
+    return;
   }
-});
 
-async function syncPagos() {
-  try {
-    // Abrir IndexedDB para obtener pagos pendientes
-    const request = indexedDB.open('ERPOfflineDB', 1);
-    
-    request.onsuccess = async (event) => {
-      const db = event.target.result;
-      const transaction = db.transaction(['pendingSync'], 'readonly');
-      const store = transaction.objectStore('pendingSync');
-      
-      const getRequest = store.getAll();
-      getRequest.onsuccess = async () => {
-        const pendingItems = getRequest.result;
-        
-        for (const item of pendingItems) {
-          if (item.type === 'pago') {
-            try {
-              const response = await fetch('/api/pagos/sync', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(item.data),
-              });
-              
-              if (response.ok) {
-                // Remover item de la cola de sincronización
-                const deleteTransaction = db.transaction(['pendingSync'], 'readwrite');
-                const deleteStore = deleteTransaction.objectStore('pendingSync');
-                deleteStore.delete(item.id);
-              }
-            } catch (error) {
-              console.error('Error sincronizando pago:', error);
-            }
-          }
+  // Network-First strategy with Cache Fallback for pages and assets
+  event.respondWith(
+    fetch(event.request)
+      .then((response) => {
+        if (!response || response.status !== 200 || response.type !== 'basic') {
+          return response;
         }
-      };
-    };
-  } catch (error) {
-    console.error('Error en sincronización de fondo:', error);
-  }
-}
+        const responseClone = response.clone();
+        caches.open(CACHE_NAME).then((cache) => {
+          cache.put(event.request, responseClone);
+        });
+        return response;
+      })
+      .catch(() => {
+        return caches.match(event.request).then((cachedResponse) => {
+          if (cachedResponse) {
+            return cachedResponse;
+          }
+          // If page navigation fails, return the cached homepage shell
+          if (event.request.headers.get('accept') && event.request.headers.get('accept').includes('text/html')) {
+            return caches.match('/');
+          }
+        });
+      })
+  );
+});

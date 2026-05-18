@@ -1,0 +1,21 @@
+{
+  "appId": "com.vertexerp.app",
+  "appName": "VertexERP Mobile",
+  "webDir": "out",
+  "server": {
+    "androidScheme": "https",
+    "allowNavigation": [
+      "*"
+    ]
+  },
+  "plugins": {
+    "Geolocation": {
+      "gpsMinDistance": 5
+    },
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_icon_config_sample",
+      "iconColor": "#2563eb",
+      "sound": "beep.wav"
+    }
+  }
+}

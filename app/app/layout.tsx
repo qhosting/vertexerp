@@ -57,7 +57,7 @@ export default function RootLayout({
         <meta name="msapplication-TileColor" content="#2563eb" />
         <meta name="msapplication-tap-highlight" content="no" />
         
-        {/* Service Worker deshabilitado temporalmente para evitar errores con redirects
+        {/* Service Worker de VertexERP para soporte offline y cache */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -65,17 +65,16 @@ export default function RootLayout({
                 window.addEventListener('load', function() {
                   navigator.serviceWorker.register('/sw.js')
                     .then(function(registration) {
-                      console.log('SW registered: ', registration);
+                      console.log('PWA Service Worker registrado con éxito: ', registration);
                     })
                     .catch(function(registrationError) {
-                      console.log('SW registration failed: ', registrationError);
+                      console.log('Fallo al registrar PWA Service Worker: ', registrationError);
                     });
                 });
               }
             `,
           }}
         />
-        */}
       </head>
       <body className={inter.className}>
         <Providers>

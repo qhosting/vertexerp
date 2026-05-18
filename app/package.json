@@ -1,16 +1,28 @@
 {
   "name": "app",
   "private": true,
+  "main": "electron-main.js",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "desktop:dev": "concurrently \"next dev\" \"cross-env NODE_ENV=development electron .\"",
+    "desktop:build": "next build && electron-builder",
+    "mobile:init": "cap init && cap add android && cap add ios",
+    "mobile:sync": "next build && cap sync",
+    "mobile:open:android": "cap open android",
+    "mobile:open:ios": "cap open ios"
   },
   "prisma": {
     "seed": "tsx --require dotenv/config scripts/seed.ts"
   },
   "devDependencies": {
+    "@capacitor/cli": "^6.0.0",
+    "concurrently": "^8.2.2",
+    "cross-env": "^7.0.3",
+    "electron": "^30.0.0",
+    "electron-builder": "^24.13.0",
     "@next/swc-wasm-nodejs": "13.5.1",
     "@types/node": "20.6.2",
     "@types/react": "18.2.22",
@@ -32,6 +44,9 @@
     "typescript": "5.2.2"
   },
   "dependencies": {
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/geolocation": "^6.0.0",
+    "@capacitor/local-notifications": "^6.0.0",
     "@floating-ui/react": "0.26.0",
     "@headlessui/react": "1.7.18",
     "@heroicons/react": "^2.2.0",
