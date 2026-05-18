@@ -144,6 +144,8 @@ export async function POST(request: NextRequest) {
         stockMinimo: parseInt(data.stockMinimo) || 0,
         stockMaximo: parseInt(data.stockMaximo) || 1000,
         unidadMedida: data.unidadMedida || 'PZA',
+        claveProdServ: data.claveProdServ || '01010101',
+        claveUnidad: data.claveUnidad || 'H87',
         pasillo: data.pasillo || null,
         estante: data.estante || null,
         nivel: data.nivel || null,

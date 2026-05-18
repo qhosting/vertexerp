@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -23,7 +22,8 @@ import {
   Star,
   AlertTriangle,
   CheckCircle,
-  Info
+  Info,
+  Building
 } from 'lucide-react';
 
 interface ProductDetailsProps {
@@ -83,7 +83,12 @@ export function ProductDetails({ product, onClose, onEdit }: ProductDetailsProps
             </div>
             <div className="flex gap-2">
               {onEdit && (
-                <Button variant="outline" size="sm" onClick={onEdit}>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={onEdit}
+                  className="border-emerald-500 text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700"
+                >
                   <Edit3 className="w-4 h-4 mr-2" />
                   Editar
                 </Button>
@@ -439,6 +444,40 @@ export function ProductDetails({ product, onClose, onEdit }: ProductDetailsProps
                 </CardContent>
               </Card>
             </div>
+
+            {/* INFORMACIÓN FISCAL SAT (CFDI 4.0) */}
+            <Card className="border-emerald-100 bg-emerald-50/10 dark:bg-emerald-950/5">
+              <CardHeader className="py-3 border-b border-emerald-100 dark:border-emerald-900/20">
+                <CardTitle className="text-sm flex items-center gap-2 text-emerald-700 font-bold dark:text-emerald-400">
+                  <Building className="h-4 w-4" />
+                  Información Fiscal del SAT (CFDI 4.0)
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="grid grid-cols-2 gap-4 pt-4 text-sm">
+                <div>
+                  <span className="text-[10px] uppercase font-bold text-slate-400">Clave SAT Producto/Servicio:</span>
+                  <p className="font-mono font-bold text-md text-slate-800 dark:text-slate-200">
+                    {product.claveProdServ || '01010101'}
+                  </p>
+                  <p className="text-[10px] text-slate-500 mt-0.5">
+                    {product.claveProdServ === '01010101' ? 'Genérico (No existe en el catálogo)' : 'Código oficial registrado'}
+                  </p>
+                </div>
+                <div>
+                  <span className="text-[10px] uppercase font-bold text-slate-400">Clave de Unidad SAT:</span>
+                  <p className="font-mono font-bold text-md text-slate-800 dark:text-slate-200">
+                    {product.claveUnidad || 'H87'}
+                  </p>
+                  <p className="text-[10px] text-slate-500 mt-0.5">
+                    {product.claveUnidad === 'H87' ? 'H87 - Pieza (Piece)' : 
+                     product.claveUnidad === 'E48' ? 'E48 - Unidad de servicio' : 
+                     product.claveUnidad === 'KGM' ? 'KGM - Kilogramo' : 
+                     product.claveUnidad === 'LTR' ? 'LTR - Litro' : 
+                     `${product.claveUnidad} - Unidad registrada`}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           {/* Ubicación */}
@@ -509,3 +548,5 @@ export function ProductDetails({ product, onClose, onEdit }: ProductDetailsProps
     </Dialog>
   );
 }
+
+export default ProductDetails;

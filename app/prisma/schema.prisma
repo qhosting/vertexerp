@@ -227,6 +227,10 @@ model Producto {
   stockMaximo   Int      @default(1000)
   unidadMedida  String   @default("PZA")
   
+  // Campos fiscales (CFDI 4.0)
+  claveProdServ String   @default("01010101") // Clave SAT de Producto/Servicio (8 dígitos)
+  claveUnidad   String   @default("H87")      // Clave SAT de Unidad de Medida (e.g., H87 = Pieza, E48 = Servicio)
+  
   // Ubicación en almacén
   pasillo       String?
   estante       String?

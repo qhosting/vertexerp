@@ -122,6 +122,8 @@ export async function PUT(
         stockMinimo: data.stockMinimo !== undefined ? parseInt(data.stockMinimo) || 0 : existingProduct.stockMinimo,
         stockMaximo: data.stockMaximo !== undefined ? parseInt(data.stockMaximo) || 1000 : existingProduct.stockMaximo,
         unidadMedida: data.unidadMedida || existingProduct.unidadMedida,
+        claveProdServ: data.claveProdServ !== undefined ? data.claveProdServ : existingProduct.claveProdServ,
+        claveUnidad: data.claveUnidad !== undefined ? data.claveUnidad : existingProduct.claveUnidad,
         pasillo: data.pasillo !== undefined ? data.pasillo : existingProduct.pasillo,
         estante: data.estante !== undefined ? data.estante : existingProduct.estante,
         nivel: data.nivel !== undefined ? data.nivel : existingProduct.nivel,

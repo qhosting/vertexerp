@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -26,7 +25,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import toast from 'react-hot-toast';
-import { Loader2, Save, X } from 'lucide-react';
+import { Loader2, Save, X, Building } from 'lucide-react';
 
 const productSchema = z.object({
   codigo: z.string().min(1, 'Código es requerido'),
@@ -58,6 +57,8 @@ const productSchema = z.object({
   stockMinimo: z.coerce.number().int().min(0),
   stockMaximo: z.coerce.number().int().min(1),
   unidadMedida: z.string().min(1, 'Unidad de medida es requerida'),
+  claveProdServ: z.string().length(8, 'La clave SAT de Producto debe ser de 8 dígitos').regex(/^[0-9]+$/, 'Solo se permiten números'),
+  claveUnidad: z.string().min(1, 'Clave de unidad SAT es requerida'),
   pasillo: z.string().optional(),
   estante: z.string().optional(),
   nivel: z.string().optional(),
@@ -126,6 +127,8 @@ export function ProductForm({ product, onClose }: ProductFormProps) {
       stockMinimo: 0,
       stockMaximo: 1000,
       unidadMedida: 'PZA',
+      claveProdServ: '01010101',
+      claveUnidad: 'H87',
       pasillo: '',
       estante: '',
       nivel: '',
@@ -177,6 +180,8 @@ export function ProductForm({ product, onClose }: ProductFormProps) {
         stockMinimo: product.stockMinimo || 0,
         stockMaximo: product.stockMaximo || 1000,
         unidadMedida: product.unidadMedida || 'PZA',
+        claveProdServ: product.claveProdServ || '01010101',
+        claveUnidad: product.claveUnidad || 'H87',
         pasillo: product.pasillo || '',
         estante: product.estante || '',
         nivel: product.nivel || '',
@@ -540,8 +545,11 @@ export function ProductForm({ product, onClose }: ProductFormProps) {
                     </div>
 
                     <div>
-                      <Label htmlFor="unidadMedida">Unidad de Medida *</Label>
-                      <Select onValueChange={(value) => setValue('unidadMedida', value)}>
+                      <Label htmlFor="unidadMedida">Unidad de Medida Interna *</Label>
+                      <Select 
+                        value={watch('unidadMedida')} 
+                        onValueChange={(value) => setValue('unidadMedida', value)}
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Seleccionar unidad" />
                         </SelectTrigger>
@@ -600,6 +608,58 @@ export function ProductForm({ product, onClose }: ProductFormProps) {
                         {...register('tiempoEntrega')}
                         placeholder="0"
                       />
+                    </div>
+                  </div>
+
+                  {/* DATOS FISCALES DEL SAT - CFDI 4.0 */}
+                  <div className="pt-6 border-t border-slate-200 mt-6 space-y-4">
+                    <h4 className="text-sm font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
+                      <Building className="h-4 w-4" />
+                      Datos de Facturación del SAT (CFDI 4.0)
+                    </h4>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="claveProdServ">Clave Prod/Serv SAT *</Label>
+                        <Input
+                          id="claveProdServ"
+                          {...register('claveProdServ')}
+                          placeholder="ej: 01010101 o 43231500"
+                          maxLength={8}
+                          className="font-mono uppercase tracking-wider"
+                        />
+                        {errors.claveProdServ && (
+                          <p className="text-sm text-red-600 mt-1">{errors.claveProdServ.message}</p>
+                        )}
+                        <p className="text-[10px] text-slate-400 mt-1">
+                          Código obligatorio de 8 dígitos (ej: 01010101 para genérico).
+                        </p>
+                      </div>
+
+                      <div>
+                        <Label htmlFor="claveUnidad">Clave de Unidad SAT *</Label>
+                        <Select 
+                          value={watch('claveUnidad')} 
+                          onValueChange={(value) => setValue('claveUnidad', value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Seleccionar clave de unidad SAT..." />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="H87">H87 - Pieza (Piece)</SelectItem>
+                            <SelectItem value="E48">E48 - Unidad de servicio</SelectItem>
+                            <SelectItem value="KGM">KGM - Kilogramo</SelectItem>
+                            <SelectItem value="LTR">LTR - Litro</SelectItem>
+                            <SelectItem value="MTR">MTR - Metro</SelectItem>
+                            <SelectItem value="F60">F60 - Caja (Box)</SelectItem>
+                            <SelectItem value="PR">PR - Par</SelectItem>
+                            <SelectItem value="XBX">XBX - Docena</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        {errors.claveUnidad && (
+                          <p className="text-sm text-red-600 mt-1">{errors.claveUnidad.message}</p>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -686,7 +746,8 @@ export function ProductForm({ product, onClose }: ProductFormProps) {
                     <div className="flex items-center space-x-2">
                       <Checkbox
                         id="requiereReceta"
-                        {...register('requiereReceta')}
+                        checked={watch('requiereReceta')}
+                        onCheckedChange={(checked) => setValue('requiereReceta', !!checked)}
                       />
                       <Label htmlFor="requiereReceta">Requiere receta médica</Label>
                     </div>
@@ -694,7 +755,8 @@ export function ProductForm({ product, onClose }: ProductFormProps) {
                     <div className="flex items-center space-x-2">
                       <Checkbox
                         id="controlado"
-                        {...register('controlado')}
+                        checked={watch('controlado')}
+                        onCheckedChange={(checked) => setValue('controlado', !!checked)}
                       />
                       <Label htmlFor="controlado">Producto controlado</Label>
                     </div>
@@ -702,7 +764,8 @@ export function ProductForm({ product, onClose }: ProductFormProps) {
                     <div className="flex items-center space-x-2">
                       <Checkbox
                         id="destacado"
-                        {...register('destacado')}
+                        checked={watch('destacado')}
+                        onCheckedChange={(checked) => setValue('destacado', !!checked)}
                       />
                       <Label htmlFor="destacado">Producto destacado</Label>
                     </div>
@@ -710,7 +773,8 @@ export function ProductForm({ product, onClose }: ProductFormProps) {
                     <div className="flex items-center space-x-2">
                       <Checkbox
                         id="oferta"
-                        {...register('oferta')}
+                        checked={watch('oferta')}
+                        onCheckedChange={(checked) => setValue('oferta', !!checked)}
                       />
                       <Label htmlFor="oferta">En oferta</Label>
                     </div>
@@ -718,7 +782,8 @@ export function ProductForm({ product, onClose }: ProductFormProps) {
                     <div className="flex items-center space-x-2">
                       <Checkbox
                         id="isActive"
-                        {...register('isActive')}
+                        checked={watch('isActive')}
+                        onCheckedChange={(checked) => setValue('isActive', !!checked)}
                       />
                       <Label htmlFor="isActive">Producto activo</Label>
                     </div>
@@ -733,7 +798,7 @@ export function ProductForm({ product, onClose }: ProductFormProps) {
               <X className="w-4 h-4 mr-2" />
               Cancelar
             </Button>
-            <Button type="submit" disabled={loading}>
+            <Button type="submit" disabled={loading} className="bg-emerald-600 hover:bg-emerald-700 text-white">
               {loading ? (
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
               ) : (
@@ -747,3 +812,5 @@ export function ProductForm({ product, onClose }: ProductFormProps) {
     </Dialog>
   );
 }
+
+export default ProductForm;
