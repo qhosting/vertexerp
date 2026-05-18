@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
     // 2. Mapear y preparar el payload para la API Contpaqi (CFDI 4.0)
     const payload = {
       folio: venta.folio,
-      rfcCliente: venta.cliente.rfc || 'XAXX010101000', // RFC Público General si no cuenta con uno propio
+      rfcCliente: (venta.cliente as any).rfc || 'XAXX010101000', // RFC Público General si no cuenta con uno propio
       usoCfdi: usoCfdi || 'G03', // Gastos en general por defecto
       regimenFiscal: regimenFiscal || '605', // Régimen de Sueldos y Salarios por defecto
       metodoPago: venta.status === 'PAGADA' ? 'PUE' as const : 'PPD' as const, // PUE para pago único inmediato, PPD si es financiado/a plazos
