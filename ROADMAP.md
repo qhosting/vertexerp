@@ -35,6 +35,10 @@ VertexERP es un **Sistema de Planificación de Recursos Empresariales (ERP)** co
 - [x] **Gestión de Garantías**: Registro de fallas, diagnósticos técnicos, seguimiento de reparaciones, reemplazos de unidades y su impacto en almacén.
 - [x] **Cobranza Móvil y Pagos**: Registro de abonos distribuidos automáticamente en capital/intereses, registro de métodos de pago (efectivo, tarjeta, transferencia, cheque), geolocalización GPS satelital de la cobranza y validación de seguridad por IMEI del dispositivo.
 - [x] **Compras y Cuentas por Pagar (CXP)**: Gestión integrada de proveedores, órdenes de compra y control de vencimientos de pasivos.
+- [x] **Soporte Multiplataforma Novedoso**: Integración de capacidades nativas e instalables:
+  * **PWA (Progressive Web App):** Caché inteligente offline, manifiesto y banners de instalación nativa para móviles y PC.
+  * **Desktop (Electron):** Empaquetador ejecutable nativo de escritorio para Windows, macOS y Linux con aislamiento de seguridad.
+  * **Móvil Nativo (Capacitor para iOS/Android):** Contenedor nativo que expone sensores de hardware como GPS (Geolocalización satelital para cobranza activa) y notificaciones locales.
 
 ### 🤖 Inteligencia Artificial y Reportes
 - [x] **Business Intelligence**: Dashboards ejecutivos con predicciones mediante Abacus.AI.
@@ -53,8 +57,6 @@ VertexERP es un **Sistema de Planificación de Recursos Empresariales (ERP)** co
   - Acción: Integración con Sentry y UptimeRobot para monitoreo en tiempo real.
 
 ### 🚀 Evolución del Negocio
-- [ ] **📲 F1.1 - Aplicación Móvil Nativa (iOS/Android)**
-  - Tecnología propuesta: React Native para mejor UX que PWA.
 - [ ] **🏦 F4.2 - Conciliación Bancaria Automática**
   - Acción: Sincronizar pagos con movimientos bancarios vía API.
 
@@ -75,6 +77,11 @@ VertexERP es un **Sistema de Planificación de Recursos Empresariales (ERP)** co
 | | - Fix de 'implicit any' en `filter()` y `reduce()` de calcular-intereses | |
 | | - Fix de 'implicit any' en `map()` en listado general de pagarés | |
 | | - Fortalecimiento preventivo de tipos en marcas y categorías de productos | |
+| 2026-05-18 | **Integración de Soporte Multiplataforma Nativo** | ✅ |
+| | - Activación de PWA con Service Worker personalizado y offline | |
+| | - Creación de empaque Desktop nativo mediante Electron y precargas | |
+| | - Integración nativa móvil para iOS & Android usando Capacitor wrappers | |
+| | - Creación de scripts de empaquetado multiplataforma en `package.json` | |
 
 ---
 **Responsable**: Lead Architect & DevOps  
