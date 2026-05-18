@@ -28,9 +28,8 @@ RUN if [ ! -f yarn.lock ] || [ -L yarn.lock ]; then \
     ls -lh yarn.lock && \
     echo "Total de líneas: $(wc -l < yarn.lock)"
 
-# Instalar dependencias con versiones exactas
-# El --frozen-lockfile asegura que las versiones sean exactamente las del lockfile
-RUN yarn install --frozen-lockfile --network-timeout 300000 --production=false
+# Instalar dependencias
+RUN yarn install --network-timeout 300000 --production=false
 
 # Stage 2: Builder
 FROM node:22-alpine AS builder
