@@ -28,6 +28,7 @@ VertexERP es un **Sistema de Planificación de Recursos Empresariales (ERP)** co
 - [x] **Catálogo e Inventario Dinámico**: Gestión de productos con 5 niveles de precios configurables, stock de máximos/mínimos, ubicación en almacén (pasillos/estantes), lote, caducidades e imágenes múltiples.
 - [x] **Movimientos de Inventario**: Bitácora y control de stock mediante movimientos clasificados (Entrada, Salida, Ajuste y Transferencia) con control de usuarios.
 - [x] **Módulo de Pedidos**: Creación, seguimiento y cancelación de pedidos con prioridades y conversión directa a ventas facturadas.
+- [x] **Cotizaciones y Presupuestos**: Generación de propuestas de presupuesto comercial con validez temporal y conversión de un solo clic a Pedidos activos o Factura de Venta directa.
 - [x] **Ventas y Créditos Amortizados**: Emisión de facturas y ventas con enganche/pago inicial, periodicidad de pago configurable (semanal, quincenal, mensual), plazos, días de gracia y control de garantías de producto.
 - [x] **Sistema de Pagarés Automáticos**: División automática de saldos de ventas en pagarés estructurados y calendarizados con estatus de control (Pendiente, Parcial, Vencido, Pagado, Cancelado).
 - [x] **Cálculo de Intereses Moratorios**: Sistema masivo automatizado para cálculo diario de morosidad basado en días vencidos y tasas configuradas.
@@ -93,6 +94,10 @@ VertexERP es un **Sistema de Planificación de Recursos Empresariales (ERP)** co
 | | - Registro e integración del módulo POS (Punto de Venta) y arqueo de caja | |
 | | - Creación del módulo E-commerce con inyección automática de pedidos | |
 | | - Acoplamiento de stock en tiempo real y flujos financieros integrados | |
+| 2026-05-18 | **Módulo de Cotizaciones y Presupuestos Comerciales** | ✅ |
+| | - Implementación de cotizaciones con fecha de expiración y validez temporal | |
+| | - Motor de conversión con 1-clic a Pedidos de ERP o Facturas de Ventas | |
+| | - Plantillas dinámicas de cotización integrables para WhatsApp/PDF | |
 
 ---
 **Responsable**: Lead Architect & DevOps  
