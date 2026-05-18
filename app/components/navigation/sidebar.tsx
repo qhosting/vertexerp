@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -28,7 +27,9 @@ import {
   Database,
   FileCheck,
   TrendingUp,
-  Truck
+  Truck,
+  ChevronDown,
+  ChevronRight
 } from 'lucide-react';
 
 interface NavigationItem {
@@ -36,175 +37,203 @@ interface NavigationItem {
   href: string;
   icon: React.ReactNode;
   badge?: string | number;
-  children?: NavigationItem[];
 }
 
-const navigationItems: NavigationItem[] = [
+interface NavigationGroup {
+  id: string;
+  title: string;
+  icon: React.ReactNode;
+  items: NavigationItem[];
+}
+
+const navigationGroups: NavigationGroup[] = [
   {
-    title: 'Dashboard',
-    href: '/',
-    icon: <Home className="h-4 w-4" />
-  },
-  // FASE 1 - Gestión Básica
-  {
-    title: 'Clientes',
-    href: '/clientes',
-    icon: <Users className="h-4 w-4" />
-  },
-  {
-    title: 'Productos',
-    href: '/productos',
-    icon: <Package className="h-4 w-4" />
-  },
-  {
-    title: 'Pedidos',
-    href: '/pedidos',
-    icon: <ShoppingCart className="h-4 w-4" />
+    id: 'comercial',
+    title: 'Comercial',
+    icon: <ShoppingCart className="h-4 w-4 text-emerald-500" />,
+    items: [
+      { title: 'Clientes', href: '/clientes', icon: <Users className="h-4 w-4" /> },
+      { title: 'Productos', href: '/productos', icon: <Package className="h-4 w-4" /> },
+      { title: 'Pedidos', href: '/pedidos', icon: <ShoppingCart className="h-4 w-4" /> },
+      { title: 'Ventas', href: '/ventas', icon: <FileText className="h-4 w-4" /> },
+      { title: 'Compras', href: '/compras', icon: <Truck className="h-4 w-4" />, badge: 'Nuevo' },
+    ]
   },
   {
-    title: 'Ventas',
-    href: '/ventas',
-    icon: <FileText className="h-4 w-4" />
+    id: 'cobranza',
+    title: 'Cobranza y Crédito',
+    icon: <CreditCard className="h-4 w-4 text-blue-500" />,
+    items: [
+      { title: 'Pagarés', href: '/pagares', icon: <CreditCard className="h-4 w-4" /> },
+      { title: 'Notas de Cargo', href: '/notas-cargo', icon: <PlusCircle className="h-4 w-4" /> },
+      { title: 'Notas de Crédito', href: '/notas-credito', icon: <MinusCircle className="h-4 w-4" /> },
+      { title: 'Reestructuras', href: '/reestructuras', icon: <RefreshCw className="h-4 w-4" /> },
+      { title: 'Factura Electrónica', href: '/facturacion-electronica', icon: <FileCheck className="h-4 w-4" />, badge: 'Nuevo' },
+    ]
   },
   {
-    title: 'Pagarés',
-    href: '/pagares',
-    icon: <CreditCard className="h-4 w-4" />
-  },
-  // FASE 2 - Crédito y Garantías
-  {
-    title: 'Notas de Cargo',
-    href: '/notas-cargo',
-    icon: <PlusCircle className="h-4 w-4" />
-  },
-  {
-    title: 'Notas de Crédito',
-    href: '/notas-credito',
-    icon: <MinusCircle className="h-4 w-4" />
+    id: 'analisis',
+    title: 'Análisis y Soporte',
+    icon: <BarChart3 className="h-4 w-4 text-indigo-500" />,
+    items: [
+      { title: 'Reportes', href: '/reportes', icon: <BarChart3 className="h-4 w-4" /> },
+      { title: 'BI / Analíticos', href: '/business-intelligence', icon: <TrendingUp className="h-4 w-4" />, badge: 'Nuevo' },
+      { title: 'Garantías', href: '/garantias', icon: <Shield className="h-4 w-4" /> },
+      { title: 'Auditoría', href: '/auditoria', icon: <Database className="h-4 w-4" />, badge: 'Nuevo' },
+    ]
   },
   {
-    title: 'Reestructuras',
-    href: '/reestructuras',
-    icon: <RefreshCw className="h-4 w-4" />
-  },
-  {
-    title: 'Garantías',
-    href: '/garantias',
-    icon: <Shield className="h-4 w-4" />
-  },
-  // FASE 3 - Analytics y Reportes
-  {
-    title: 'Reportes',
-    href: '/reportes',
-    icon: <BarChart3 className="h-4 w-4" />
-  },
-  {
-    title: 'Configuración',
-    href: '/configuracion',
-    icon: <Settings className="h-4 w-4" />
-  },
-  // FASE 4 - Módulos Avanzados
-  {
-    title: 'Compras',
-    href: '/compras',
-    icon: <Truck className="h-4 w-4" />,
-    badge: 'Nuevo'
-  },
-  {
-    title: 'Automatización',
-    href: '/automatizacion',
-    icon: <Bot className="h-4 w-4" />,
-    badge: 'Nuevo'
-  },
-  {
-    title: 'Auditoría',
-    href: '/auditoria',
-    icon: <Database className="h-4 w-4" />,
-    badge: 'Nuevo'
-  },
-  {
-    title: 'Facturación Electrónica',
-    href: '/facturacion-electronica',
-    icon: <FileCheck className="h-4 w-4" />,
-    badge: 'Nuevo'
-  },
-  {
-    title: 'Business Intelligence',
-    href: '/business-intelligence',
-    icon: <TrendingUp className="h-4 w-4" />,
-    badge: 'Nuevo'
+    id: 'ajustes',
+    title: 'Ajustes',
+    icon: <Settings className="h-4 w-4 text-gray-500" />,
+    items: [
+      { title: 'Automatización', href: '/automatizacion', icon: <Bot className="h-4 w-4" />, badge: 'Nuevo' },
+      { title: 'Configuración', href: '/configuracion', icon: <Settings className="h-4 w-4" /> },
+    ]
   }
 ];
 
 function NavigationContent() {
   const pathname = usePathname();
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
+
+  // Auto-expandir grupo si alguna subruta está activa
+  useEffect(() => {
+    const activeGroup = navigationGroups.find(group => 
+      group.items.some(item => pathname === item.href || pathname.startsWith(item.href + '/'))
+    );
+    if (activeGroup) {
+      setOpenGroups(prev => ({ ...prev, [activeGroup.id]: true }));
+    }
+  }, [pathname]);
+
+  const toggleGroup = (id: string) => {
+    setOpenGroups(prev => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  const isDashboardActive = pathname === '/dashboard' || pathname === '/';
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-slate-900 text-slate-100 border-r border-slate-800">
       {/* Logo */}
-      <div className="p-6">
-        <Link href="/" className="flex items-center gap-2">
-          <Building className="h-8 w-8 text-primary" />
+      <div className="p-6 border-b border-slate-800">
+        <Link href="/" className="flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-500 text-slate-950 shadow-lg shadow-emerald-500/20">
+            <Building className="h-5 w-5" />
+          </div>
           <div className="flex flex-col">
-            <span className="text-lg font-bold">Sistema ERP</span>
-            <span className="text-xs text-muted-foreground">v4.0.0</span>
+            <span className="text-md font-bold tracking-tight text-white">VertexERP</span>
+            <span className="text-[10px] font-medium text-emerald-400 uppercase tracking-widest">Corporativo</span>
           </div>
         </Link>
       </div>
 
       {/* Navigation */}
-      <ScrollArea className="flex-1 px-3">
-        <div className="space-y-1">
-          {navigationItems.map((item, index) => {
-            const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
-            
-            return (
-              <div key={index}>
-                <Link href={item.href}>
-                  <Button
-                    variant={isActive ? 'secondary' : 'ghost'}
-                    className={cn(
-                      'w-full justify-start gap-3 h-10',
-                      isActive && 'bg-secondary font-medium'
-                    )}
-                  >
-                    {item.icon}
-                    <span className="flex-1 text-left">{item.title}</span>
-                    {item.badge && (
-                      <span className="text-xs bg-primary text-primary-foreground px-2 py-1 rounded-full">
-                        {item.badge}
-                      </span>
-                    )}
-                  </Button>
-                </Link>
-              </div>
-            );
-          })}
+      <ScrollArea className="flex-1 px-3 py-4">
+        <div className="space-y-4">
+          
+          {/* Dashboard Direct Link */}
+          <div className="px-2">
+            <Link href="/dashboard">
+              <Button
+                variant="ghost"
+                className={cn(
+                  'w-full justify-start gap-3 h-10 text-slate-300 hover:text-white hover:bg-slate-800/60',
+                  isDashboardActive && 'bg-slate-800 text-white font-medium border-l-2 border-emerald-500 rounded-l-none pl-[14px]'
+                )}
+              >
+                <Home className={cn("h-4 w-4", isDashboardActive ? "text-emerald-400" : "text-slate-400")} />
+                <span className="flex-1 text-left">Dashboard</span>
+              </Button>
+            </Link>
+          </div>
+
+          {/* Grouped Menus */}
+          <div className="space-y-2">
+            {navigationGroups.map((group) => {
+              const isOpen = !!openGroups[group.id];
+              const isGroupActive = group.items.some(item => 
+                pathname === item.href || pathname.startsWith(item.href + '/')
+              );
+
+              return (
+                <div key={group.id} className="space-y-1">
+                  {/* Group Header Button */}
+                  <div className="px-2">
+                    <Button
+                      variant="ghost"
+                      onClick={() => toggleGroup(group.id)}
+                      className={cn(
+                        'w-full justify-between gap-3 h-10 text-slate-400 hover:text-white hover:bg-slate-800/40 font-semibold text-xs uppercase tracking-wider',
+                        isGroupActive && 'text-slate-200'
+                      )}
+                    >
+                      <div className="flex items-center gap-3">
+                        {group.icon}
+                        <span>{group.title}</span>
+                      </div>
+                      {isOpen ? (
+                        <ChevronDown className="h-3.5 w-3.5 text-slate-500 transition-transform duration-200" />
+                      ) : (
+                        <ChevronRight className="h-3.5 w-3.5 text-slate-500 transition-transform duration-200" />
+                      )}
+                    </Button>
+                  </div>
+
+                  {/* Group Sub-items */}
+                  {isOpen && (
+                    <div className="pl-4 pr-2 space-y-1 border-l border-slate-800 ml-5 mt-1 transition-all duration-300 ease-in-out">
+                      {group.items.map((item, itemIdx) => {
+                        const isSubActive = pathname === item.href || pathname.startsWith(item.href + '/');
+
+                        return (
+                          <Link key={itemIdx} href={item.href}>
+                            <Button
+                              variant="ghost"
+                              className={cn(
+                                'w-full justify-start gap-3 h-9 text-xs text-slate-400 hover:text-white hover:bg-slate-800/60 rounded-md',
+                                isSubActive && 'bg-slate-800 text-white font-medium text-emerald-400'
+                              )}
+                            >
+                              <div className={cn("w-1.5 h-1.5 rounded-full bg-slate-600", isSubActive && "bg-emerald-500")} />
+                              <span className="flex-1 text-left">{item.title}</span>
+                              {item.badge && (
+                                <span className="text-[9px] bg-emerald-500/20 text-emerald-400 font-semibold px-2 py-0.5 rounded-full">
+                                  {item.badge}
+                                </span>
+                              )}
+                            </Button>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
         </div>
 
-        {/* Separador para módulos avanzados */}
-        <div className="my-6 px-3">
-          <div className="border-t">
-            <div className="mt-4 mb-2 px-3">
-              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                Módulos Avanzados (FASE 4)
-              </span>
-            </div>
+        {/* Separator & Badge */}
+        <div className="mt-8 px-4 py-3 bg-slate-950/40 rounded-lg border border-slate-800/40 mx-2">
+          <div className="flex items-center gap-2 text-xs font-semibold text-emerald-400">
+            <Zap className="h-3.5 w-3.5 animate-pulse" />
+            <span>VertexERP Activado</span>
           </div>
-        </div>
-
-        {/* Footer */}
-        <div className="p-4 mt-8 border-t">
-          <div className="text-xs text-muted-foreground space-y-1">
-            <div className="flex items-center gap-2">
-              <Zap className="h-3 w-3" />
-              <span>Sistema activo</span>
-            </div>
-            <div>Última actualización: 19/09/2024</div>
-            <div>© 2024 Sistema ERP Completo</div>
-          </div>
+          <p className="text-[10px] text-slate-500 mt-1">
+            Suite corporativa premium con base de datos en tiempo real.
+          </p>
         </div>
       </ScrollArea>
+
+      {/* Footer */}
+      <div className="p-4 border-t border-slate-800 bg-slate-950/50">
+        <div className="text-[10px] text-slate-500 space-y-1">
+          <div>Última actualización: 18/05/2026</div>
+          <div>© 2026 VertexERP Completo</div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -217,18 +246,18 @@ export function Sidebar() {
       {/* Mobile Sidebar */}
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetTrigger asChild>
-          <Button variant="ghost" size="sm" className="md:hidden">
+          <Button variant="ghost" size="sm" className="md:hidden text-slate-400 hover:text-white">
             <Menu className="h-5 w-5" />
             <span className="sr-only">Abrir menú</span>
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="p-0 w-80">
+        <SheetContent side="left" className="p-0 w-64 bg-slate-900 border-r-slate-800">
           <NavigationContent />
         </SheetContent>
       </Sheet>
 
       {/* Desktop Sidebar */}
-      <div className="hidden md:flex md:w-80 md:flex-col md:fixed md:inset-y-0 border-r bg-background">
+      <div className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 border-r border-slate-800 bg-slate-900">
         <NavigationContent />
       </div>
     </>
