@@ -114,7 +114,7 @@ export async function GET(request: NextRequest) {
     ])
 
     // Calcular información adicional para cada pagaré
-    const pagaresConInfo = pagares.map(pagare => {
+    const pagaresConInfo = pagares.map((pagare: any) => {
       const hoy = new Date()
       const fechaVencimiento = new Date(pagare.fechaVencimiento)
       const diasVencido = pagare.estatus === 'VENCIDO' || pagare.estatus === 'PENDIENTE' ? 
