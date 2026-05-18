@@ -39,6 +39,7 @@ VertexERP es un **Sistema de Planificación de Recursos Empresariales (ERP)** co
 - [x] **Cobranza Móvil y Pagos**: Registro de abonos distribuidos automáticamente en capital/intereses, registro de métodos de pago (efectivo, tarjeta, transferencia, cheque), geolocalización GPS satelital de la cobranza y validación de seguridad por IMEI del dispositivo.
 - [x] **Punto de Venta (POS Pymes Comercialización)**: Venta rápida por caja, soporte de escáner de barras, arqueos/apertura/cortes de caja y tickets de impresora térmica.
 - [x] **E-commerce Sincronizado**: Tienda online sincronizada con stock e inyección automatizada de pedidos al ERP con pasarelas de pago.
+- [x] **Sitio Web Corporativo y Landing Page (Webuilder)**: Sitio web público interactivo de presentación comercial con catálogo y formulario de contacto, controlable dinámicamente desde el gestor de addons.
 - [x] **Facturación Electrónica SAT (CFDI 4.0 - Contpaqi API)**: Adaptado para el marco fiscal mexicano, timbrado oficial directo de facturas, inyección de catálogos y emisión automática de Recibos Electrónicos de Pago (REP) vía el SDK de Contpaqi Comercial Premium local en el servidor.
 - [x] **Compras y Cuentas por Pagar (CXP)**: Gestión integrada de proveedores, órdenes de compra y control de vencimientos de pasivos.
 - [x] **Soporte Multiplataforma Novedoso**: Integración de capacidades nativas e instalables:
