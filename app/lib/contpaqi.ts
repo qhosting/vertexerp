@@ -35,8 +35,8 @@ class ContpaqiService {
   constructor() {
     this.config = {
       baseUrl: process.env.CONTPAQI_API_URL || 'http://localhost:5000/api',
-      apiKey: process.env.CONTPAQI_API_KEY || 'VortexContpaqiAPI2024',
-      companyId: process.env.CONTPAQI_COMPANY_ID || 'DQ'
+      apiKey: process.env.CONTPAQI_API_KEY || '',
+      companyId: process.env.CONTPAQI_COMPANY_ID || ''
     };
   }
 
