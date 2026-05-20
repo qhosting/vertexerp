@@ -37,6 +37,7 @@ interface NavigationItem {
   href: string;
   icon: React.ReactNode;
   badge?: string | number;
+  addonId?: string; // Mapped addon ID from registry
 }
 
 interface NavigationGroup {
@@ -52,11 +53,11 @@ const navigationGroups: NavigationGroup[] = [
     title: 'Comercial',
     icon: <ShoppingCart className="h-4 w-4 text-emerald-500" />,
     items: [
-      { title: 'Clientes', href: '/clientes', icon: <Users className="h-4 w-4" /> },
-      { title: 'Productos', href: '/productos', icon: <Package className="h-4 w-4" /> },
-      { title: 'Pedidos', href: '/pedidos', icon: <ShoppingCart className="h-4 w-4" /> },
-      { title: 'Ventas', href: '/ventas', icon: <FileText className="h-4 w-4" /> },
-      { title: 'Compras', href: '/compras', icon: <Truck className="h-4 w-4" />, badge: 'Nuevo' },
+      { title: 'Clientes', href: '/clientes', icon: <Users className="h-4 w-4" />, addonId: 'crm-clientes' },
+      { title: 'Productos', href: '/productos', icon: <Package className="h-4 w-4" />, addonId: 'inventario-compras' },
+      { title: 'Pedidos', href: '/pedidos', icon: <ShoppingCart className="h-4 w-4" />, addonId: 'pedidos-ventas' },
+      { title: 'Ventas', href: '/ventas', icon: <FileText className="h-4 w-4" />, addonId: 'pedidos-ventas' },
+      { title: 'Compras', href: '/compras', icon: <Truck className="h-4 w-4" />, badge: 'Nuevo', addonId: 'inventario-compras' },
     ]
   },
   {
@@ -64,11 +65,11 @@ const navigationGroups: NavigationGroup[] = [
     title: 'Cobranza y Crédito',
     icon: <CreditCard className="h-4 w-4 text-blue-500" />,
     items: [
-      { title: 'Pagarés', href: '/pagares', icon: <CreditCard className="h-4 w-4" /> },
-      { title: 'Notas de Cargo', href: '/notas-cargo', icon: <PlusCircle className="h-4 w-4" /> },
-      { title: 'Notas de Crédito', href: '/notas-credito', icon: <MinusCircle className="h-4 w-4" /> },
-      { title: 'Reestructuras', href: '/reestructuras', icon: <RefreshCw className="h-4 w-4" /> },
-      { title: 'Factura Electrónica', href: '/facturacion-electronica', icon: <FileCheck className="h-4 w-4" />, badge: 'Nuevo' },
+      { title: 'Pagarés', href: '/pagares', icon: <CreditCard className="h-4 w-4" />, addonId: 'pagares-moratorios' },
+      { title: 'Notas de Cargo', href: '/notas-cargo', icon: <PlusCircle className="h-4 w-4" />, addonId: 'notas-credito-cargo' },
+      { title: 'Notas de Crédito', href: '/notas-credito', icon: <MinusCircle className="h-4 w-4" />, addonId: 'notas-credito-cargo' },
+      { title: 'Reestructuras', href: '/reestructuras', icon: <RefreshCw className="h-4 w-4" />, addonId: 'reestructuras-credito' },
+      { title: 'Factura Electrónica', href: '/facturacion-electronica', icon: <FileCheck className="h-4 w-4" />, badge: 'Nuevo', addonId: 'facturacion-sat' },
     ]
   },
   {
@@ -77,8 +78,8 @@ const navigationGroups: NavigationGroup[] = [
     icon: <BarChart3 className="h-4 w-4 text-indigo-500" />,
     items: [
       { title: 'Reportes', href: '/reportes', icon: <BarChart3 className="h-4 w-4" /> },
-      { title: 'BI / Analíticos', href: '/business-intelligence', icon: <TrendingUp className="h-4 w-4" />, badge: 'Nuevo' },
-      { title: 'Garantías', href: '/garantias', icon: <Shield className="h-4 w-4" /> },
+      { title: 'BI / Analíticos', href: '/business-intelligence', icon: <TrendingUp className="h-4 w-4" />, badge: 'Nuevo', addonId: 'dashboard-ai' },
+      { title: 'Garantías', href: '/garantias', icon: <Shield className="h-4 w-4" />, addonId: 'garantias-productos' },
       { title: 'Auditoría', href: '/auditoria', icon: <Database className="h-4 w-4" />, badge: 'Nuevo' },
     ]
   },
@@ -96,16 +97,59 @@ const navigationGroups: NavigationGroup[] = [
 function NavigationContent() {
   const pathname = usePathname();
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
+  const [activeAddons, setActiveAddons] = useState<string[]>([]);
+  const [loadingAddons, setLoadingAddons] = useState(true);
+
+  // Cargar módulos activos
+  useEffect(() => {
+    async function fetchAddons() {
+      try {
+        const res = await fetch('/api/configuracion/addons');
+        if (res.ok) {
+          const data = await res.json();
+          if (data && Array.isArray(data.activeIds)) {
+            setActiveAddons(data.activeIds);
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching active addons in Sidebar:', err);
+      } finally {
+        setLoadingAddons(false);
+      }
+    }
+    fetchAddons();
+
+    // Escuchar actualizaciones en tiempo real
+    window.addEventListener('addons-updated', fetchAddons);
+    return () => {
+      window.removeEventListener('addons-updated', fetchAddons);
+    };
+  }, []);
+
+  const isItemVisible = (item: NavigationItem) => {
+    if (loadingAddons) return true; // Mostrar mientras carga para evitar parpadeos
+    if (!item.addonId) return true; // CORE/Base siempre visibles
+    return activeAddons.includes(item.addonId);
+  };
+
+  // Filtrar grupos y sus sub-items
+  const visibleGroups = navigationGroups.map(group => {
+    const visibleItems = group.items.filter(isItemVisible);
+    return {
+      ...group,
+      items: visibleItems
+    };
+  }).filter(group => group.items.length > 0);
 
   // Auto-expandir grupo si alguna subruta está activa
   useEffect(() => {
-    const activeGroup = navigationGroups.find(group => 
+    const activeGroup = visibleGroups.find(group => 
       group.items.some(item => pathname === item.href || pathname.startsWith(item.href + '/'))
     );
     if (activeGroup) {
       setOpenGroups(prev => ({ ...prev, [activeGroup.id]: true }));
     }
-  }, [pathname]);
+  }, [pathname, loadingAddons]);
 
   const toggleGroup = (id: string) => {
     setOpenGroups(prev => ({ ...prev, [id]: !prev[id] }));
@@ -150,7 +194,7 @@ function NavigationContent() {
 
           {/* Grouped Menus */}
           <div className="space-y-2">
-            {navigationGroups.map((group) => {
+            {visibleGroups.map((group) => {
               const isOpen = !!openGroups[group.id];
               const isGroupActive = group.items.some(item => 
                 pathname === item.href || pathname.startsWith(item.href + '/')

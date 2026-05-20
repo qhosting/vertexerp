@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
       regimenFiscal: regimenFiscal || '605', // Régimen de Sueldos y Salarios por defecto
       metodoPago: venta.status === 'PAGADA' ? 'PUE' as const : 'PPD' as const, // PUE para pago único inmediato, PPD si es financiado/a plazos
       formaPago: venta.status === 'PAGADA' ? '01' : '99', // 01 Efectivo, 99 Por definir si es crédito
-      items: venta.detalles.map((d) => ({
+      items: venta.detalles.map((d: any) => ({
         codigoProducto: d.producto.codigo,
         cantidad: d.cantidad,
         precioUnitario: d.precioUnitario,

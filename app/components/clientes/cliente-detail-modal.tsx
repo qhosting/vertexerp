@@ -43,6 +43,7 @@ interface ClienteDetalle {
   colonia?: string;
   calle?: string;
   numeroExterior?: string;
+  numeroInterior?: string;
   codigoPostal?: string;
   saldoActual: number;
   pagosPeriodicos: number;

@@ -2,6 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Header } from '@/components/navigation/header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
@@ -157,30 +158,28 @@ export default function DashboardPage() {
     ((cobranzaActual - cobranzaAnterior) / cobranzaAnterior) * 100 : 0;
 
   return (
-    <div className="container mx-auto px-6 py-8">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard Ejecutivo</h1>
-          <p className="text-gray-500 mt-2">Panel de control y métricas de negocio</p>
-        </div>
+    <div className="space-y-6 p-6">
+      <Header 
+        title="Dashboard Ejecutivo"
+        description="Panel de control y métricas de negocio"
+      />
+
+      <div className="flex justify-end items-center gap-4">
+        <Select value={periodo} onValueChange={setPeriodo}>
+          <SelectTrigger className="w-48">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="3">Últimos 3 meses</SelectItem>
+            <SelectItem value="6">Últimos 6 meses</SelectItem>
+            <SelectItem value="12">Último año</SelectItem>
+          </SelectContent>
+        </Select>
         
-        <div className="flex items-center gap-4">
-          <Select value={periodo} onValueChange={setPeriodo}>
-            <SelectTrigger className="w-48">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="3">Últimos 3 meses</SelectItem>
-              <SelectItem value="6">Últimos 6 meses</SelectItem>
-              <SelectItem value="12">Último año</SelectItem>
-            </SelectContent>
-          </Select>
-          
-          <Button onClick={cargarDatos} variant="outline">
-            <RefreshCcw className="w-4 h-4 mr-2" />
-            Actualizar
-          </Button>
-        </div>
+        <Button onClick={cargarDatos} variant="outline">
+          <RefreshCcw className="w-4 h-4 mr-2" />
+          Actualizar
+        </Button>
       </div>
 
       {/* Métricas principales */}

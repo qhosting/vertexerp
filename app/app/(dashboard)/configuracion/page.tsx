@@ -11,20 +11,11 @@ import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
-import { 
-  Settings, 
-  Building, 
-  Palette, 
-  DollarSign, 
-  Bell, 
-  Link, 
-  Shield,
-  Save,
-  RefreshCw,
-  Eye,
-  EyeOff
-} from 'lucide-react';
+import * as LucideIcons from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
+import { cn } from '@/lib/utils';
+
+const { Settings, Building, Palette, DollarSign, Bell, Link, Shield, Save, RefreshCw, Eye, EyeOff } = LucideIcons;
 
 interface Configuracion {
   id: string;
@@ -44,11 +35,71 @@ export default function ConfiguracionPage() {
   const [loading, setLoading] = useState(true);
   const [guardando, setGuardando] = useState(false);
   const [mostrarClaves, setMostrarClaves] = useState(false);
+  const [addons, setAddons] = useState<any[]>([]);
+  const [loadingAddons, setLoadingAddons] = useState(true);
   const { toast } = useToast();
 
   useEffect(() => {
     cargarConfiguracion();
+    cargarAddons();
   }, []);
+
+  const cargarAddons = async () => {
+    try {
+      setLoadingAddons(true);
+      const res = await fetch('/api/configuracion/addons');
+      if (res.ok) {
+        const data = await res.json();
+        if (data && Array.isArray(data.addons)) {
+          setAddons(data.addons);
+        }
+      }
+    } catch (err) {
+      console.error('Error al cargar addons:', err);
+    } finally {
+      setLoadingAddons(false);
+    }
+  };
+
+  const handleToggleAddon = async (addonId: string, enabled: boolean) => {
+    try {
+      const res = await fetch('/api/configuracion/addons', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ addonId, enabled }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        toast({
+          title: 'Módulo actualizado',
+          description: `El módulo ha sido ${enabled ? 'activado' : 'desactivado'} exitosamente.`,
+        });
+        
+        // Recargar la lista de addons
+        await cargarAddons();
+        
+        // Notificar al Sidebar en tiempo real
+        window.dispatchEvent(new Event('addons-updated'));
+      } else {
+        const errData = await res.json();
+        toast({
+          title: 'Error',
+          description: errData.error || 'No se pudo actualizar el módulo.',
+          variant: 'destructive',
+        });
+      }
+    } catch (error) {
+      console.error('Error al cambiar estado del addon:', error);
+      toast({
+        title: 'Error',
+        description: 'Error de red al actualizar el módulo.',
+        variant: 'destructive',
+      });
+    }
+  };
 
   const cargarConfiguracion = async () => {
     try {
@@ -154,12 +205,13 @@ export default function ConfiguracionPage() {
       </div>
 
       <Tabs defaultValue="empresa" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-6">
+        <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="empresa">Empresa</TabsTrigger>
           <TabsTrigger value="apariencia">Apariencia</TabsTrigger>
           <TabsTrigger value="financiero">Financiero</TabsTrigger>
           <TabsTrigger value="notificaciones">Notificaciones</TabsTrigger>
           <TabsTrigger value="integraciones">Integraciones</TabsTrigger>
+          <TabsTrigger value="addons">Módulos</TabsTrigger>
           <TabsTrigger value="avanzado">Avanzado</TabsTrigger>
         </TabsList>
 
@@ -713,6 +765,143 @@ export default function ConfiguracionPage() {
                   </Button>
                 </div>
               </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Gestión de Módulos (Addons) */}
+        <TabsContent value="addons" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <LucideIcons.LayoutGrid className="w-5 h-5 text-emerald-500" />
+                Módulos y Addons de Marca Blanca
+              </CardTitle>
+              <CardDescription>
+                Habilite o deshabilite funcionalidades completas de la plataforma. La barra de navegación lateral y los permisos se adaptarán automáticamente en tiempo real.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {loadingAddons ? (
+                <div className="flex items-center justify-center py-12">
+                  <LucideIcons.Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {addons.map((addon) => {
+                    const categoryColors: Record<string, string> = {
+                      CORE: 'bg-slate-100 text-slate-800 border-slate-200',
+                      BUSINESS: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                      FINANCIAL: 'bg-blue-50 text-blue-700 border-blue-200',
+                      SUPPORT: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+                      AI: 'bg-purple-50 text-purple-700 border-purple-200',
+                    };
+                    const categoryNames: Record<string, string> = {
+                      CORE: 'Núcleo Base',
+                      BUSINESS: 'Procesos de Negocio',
+                      FINANCIAL: 'Finanzas y Crédito',
+                      SUPPORT: 'Soporte y Utilidades',
+                      AI: 'Inteligencia Artificial',
+                    };
+
+                    const IconComponent = (LucideIcons as any)[addon.icon] || LucideIcons.HelpCircle;
+
+                    return (
+                      <Card 
+                        key={addon.id} 
+                        className={cn(
+                          "border transition-all duration-300 hover:shadow-md flex flex-col justify-between",
+                          addon.isActive ? "border-emerald-200 bg-emerald-50/5" : "border-slate-200 bg-white"
+                        )}
+                      >
+                        <CardHeader className="pb-3 flex flex-row items-start justify-between space-y-0">
+                          <div className="flex gap-3 items-center">
+                            <div className={cn(
+                              "p-2.5 rounded-lg border transition-all",
+                              addon.isActive 
+                                ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" 
+                                : "bg-slate-100 text-slate-400 border-slate-200"
+                            )}>
+                              <IconComponent className="h-5 w-5" />
+                            </div>
+                            <div>
+                              <CardTitle className="text-sm font-bold tracking-tight text-slate-800 line-clamp-1">
+                                {addon.name}
+                              </CardTitle>
+                              <div className="flex gap-1.5 mt-1 items-center">
+                                <span className={cn(
+                                  "text-[10px] px-2 py-0.5 rounded-full border font-semibold",
+                                  categoryColors[addon.category] || 'bg-slate-100'
+                                )}>
+                                  {categoryNames[addon.category] || addon.category}
+                                </span>
+                                <span className="text-[9px] text-slate-400 font-mono font-medium">
+                                  v{addon.version}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center pt-1">
+                            <Switch 
+                              checked={addon.isActive}
+                              onCheckedChange={(checked) => handleToggleAddon(addon.id, checked)}
+                              disabled={addon.isCore}
+                            />
+                          </div>
+                        </CardHeader>
+                        
+                        <CardContent className="pb-4 pt-1 flex-1 flex flex-col justify-between">
+                          <p className="text-xs text-slate-500 leading-relaxed min-h-[40px]">
+                            {addon.description}
+                          </p>
+                          
+                          {addon.dependencies && addon.dependencies.length > 0 && (
+                            <div className="mt-4 pt-3 border-t border-slate-100/60 flex items-center justify-between">
+                              <span className="text-[10px] text-slate-400 font-medium flex items-center gap-1">
+                                <LucideIcons.Layers className="w-3.5 h-3.5" />
+                                Dependencias:
+                              </span>
+                              <div className="flex flex-wrap gap-1 justify-end max-w-[70%]">
+                                {addon.dependencies.map((depId: string) => {
+                                  const depAddon = addons.find(a => a.id === depId);
+                                  const depActive = depAddon?.isActive;
+                                  return (
+                                    <span 
+                                      key={depId} 
+                                      className={cn(
+                                        "text-[9px] px-2 py-0.5 rounded font-mono font-medium border transition-colors",
+                                        depActive 
+                                          ? "bg-slate-50 text-slate-600 border-slate-200" 
+                                          : "bg-red-50 text-red-600 border-red-200 font-bold"
+                                      )}
+                                      title={depAddon?.name || depId}
+                                    >
+                                      {depAddon ? depAddon.name.split(' ')[0] : depId}
+                                    </span>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          )}
+                          
+                          {addon.isCore && (
+                            <div className="mt-4 pt-2 border-t border-slate-100/60 flex items-center justify-between">
+                              <span className="text-[10px] text-slate-400 font-medium flex items-center gap-1">
+                                <LucideIcons.ShieldAlert className="w-3.5 h-3.5" />
+                                Módulo Núcleo:
+                              </span>
+                              <span className="text-[9px] bg-slate-100 text-slate-500 border border-slate-200 px-2 py-0.5 rounded font-mono font-bold">
+                                SIEMPRE REQUERIDO
+                              </span>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
