@@ -75,6 +75,9 @@ model User {
   
   // Nuevas relaciones - Garantías
   garantiasAtendidas Garantia[] @relation("GarantiaAtendida")
+  
+  // Módulo de Prospectos CRM
+  prospectosAsignados Prospecto[] @relation("ProspectoVendedor")
 }
 
 model VerificationToken {
@@ -181,6 +184,9 @@ model Cliente {
   // Nuevas relaciones - Reestructuras y Garantías
   reestructuras     ReestructuraCredito[]
   garantias         Garantia[]
+  
+  // Módulo de Prospectos CRM
+  prospectoOrigen   Prospecto? @relation("ClienteDeProspecto")
   
   @@map("clientes")
 }
@@ -944,4 +950,81 @@ enum StatusGarantia {
   RESUELTA
   VENCIDA
   CANCELADA
+}
+
+// ============= MÓDULO DE PROSPECTOS Y LEADS (CRM) =============
+
+enum ProspectoStatus {
+  NUEVO
+  CONTACTADO
+  CITA_AGENDADA
+  EN_NEGOCIACION
+  CONVERTIDO
+  PERDIDO
+}
+
+enum ProspectoPrioridad {
+  BAJA
+  MEDIA
+  ALTA
+}
+
+model Prospecto {
+  id              String             @id @default(cuid())
+  nombre          String
+  empresa         String?
+  email           String?
+  telefono        String?
+  valorEstimado   Float              @default(0.0)
+  status          ProspectoStatus    @default(NUEVO)
+  prioridad       ProspectoPrioridad @default(MEDIA)
+  origen          String?            // Ej. "Web", "Referido", "Campaña"
+  notas           String?            @db.Text
+  
+  // Asignación interna
+  vendedorId      String?
+  vendedor        User?              @relation("ProspectoVendedor", fields: [vendedorId], references: [id])
+  
+  // Relación con Cliente creado al convertir
+  clienteCreadoId String?            @unique
+  clienteCreado   Cliente?           @relation("ClienteDeProspecto", fields: [clienteCreadoId], references: [id])
+  
+  // Historial de actividades
+  actividades     ActividadProspecto[]
+  
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  @@index([status])
+  @@index([vendedorId])
+  @@map("prospectos")
+}
+
+enum ActividadTipo {
+  LLAMADA
+  CORREO
+  REUNION
+  TAREA
+  NOTA
+}
+
+model ActividadProspecto {
+  id              String        @id @default(cuid())
+  prospectoId     String
+  prospecto       Prospecto     @relation(fields: [prospectoId], references: [id], onDelete: Cascade)
+  tipo            ActividadTipo @default(NOTA)
+  titulo          String
+  descripcion     String?       @db.Text
+  fechaProgramada DateTime?   // Si es una tarea a realizar
+  completada      Boolean       @default(false)
+  fechaCompletada DateTime?
+  
+  // Creador
+  creadoPorId     String?
+  
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([prospectoId])
+  @@map("actividad_prospectos")
 }

@@ -194,6 +194,17 @@ export const ADDONS_REGISTRY: Addon[] = [
     icon: 'Globe',
     isCore: false,
     path: '/'
+  },
+  {
+    id: 'crm-prospectos',
+    name: 'Seguimiento de Prospectos (CRM Leads)',
+    version: '1.0.0',
+    description: 'Embudo de ventas Kanban, pipeline de prospectos, bitácora de actividades (llamadas, correos) y conversión directa a Cliente con 1-clic.',
+    category: 'BUSINESS',
+    requiredRole: ['SUPERADMIN', 'ADMIN', 'VENTAS'],
+    icon: 'UserPlus',
+    isCore: false,
+    path: '/prospectos'
   }
 ];
 
@@ -218,7 +229,7 @@ export class AddonManager {
     } catch (e) {
       console.error('Error cargando módulos activos:', e);
     }
-    // Si no hay configuración previa, retornar todos los módulos activos por defecto
+    // Si no hay configuración previa o es inválida, retornar todos los módulos activos por defecto
     return ADDONS_REGISTRY.map(addon => addon.id);
   }
 
