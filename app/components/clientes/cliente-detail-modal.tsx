@@ -150,27 +150,22 @@ export function ClienteDetailModal({ isOpen, onClose, clienteId, onEdit }: Clien
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader className="flex flex-row items-center justify-between">
+        <DialogHeader className="flex flex-row items-center justify-between pr-6">
           <DialogTitle className="flex items-center gap-2">
             <User className="h-5 w-5" />
             Detalles del Cliente
           </DialogTitle>
-          <div className="flex gap-2">
-            {onEdit && (
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => onEdit(clienteId)}
-                className="border-emerald-500 text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700"
-              >
-                <Edit className="h-4 w-4 mr-1" />
-                Editar
-              </Button>
-            )}
-            <Button variant="ghost" size="sm" onClick={onClose}>
-              <X className="h-4 w-4" />
+          {onEdit && (
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => onEdit(clienteId)}
+              className="border-emerald-500 text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700"
+            >
+              <Edit className="h-4 w-4 mr-1" />
+              Editar
             </Button>
-          </div>
+          )}
         </DialogHeader>
 
         {loading ? (

@@ -163,14 +163,11 @@ CLI-002,María García,555-9999,,maria@email.com,Zapopan,Jalisco,Providencia,Av.
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl">
-        <DialogHeader className="flex flex-row items-center justify-between">
+        <DialogHeader className="pr-6">
           <DialogTitle className="flex items-center gap-2">
             <Upload className="h-5 w-5" />
             Importar Clientes
           </DialogTitle>
-          <Button variant="ghost" size="sm" onClick={onClose}>
-            <X className="h-4 w-4" />
-          </Button>
         </DialogHeader>
 
         <div className="space-y-6">

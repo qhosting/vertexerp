@@ -75,28 +75,23 @@ export function ProductDetails({ product, onClose, onEdit }: ProductDetailsProps
   return (
     <Dialog open={true} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
+        <DialogHeader className="pr-6">
           <div className="flex items-start justify-between">
             <div>
               <DialogTitle className="text-xl">{product.nombre}</DialogTitle>
               <p className="text-sm text-gray-500 mt-1">Código: {product.codigo}</p>
             </div>
-            <div className="flex gap-2">
-              {onEdit && (
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={onEdit}
-                  className="border-emerald-500 text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700"
-                >
-                  <Edit3 className="w-4 h-4 mr-2" />
-                  Editar
-                </Button>
-              )}
-              <Button variant="outline" size="sm" onClick={onClose}>
-                <X className="w-4 h-4" />
+            {onEdit && (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={onEdit}
+                className="border-emerald-500 text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700"
+              >
+                <Edit3 className="w-4 h-4 mr-2" />
+                Editar
               </Button>
-            </div>
+            )}
           </div>
 
           {/* Status Badges */}
