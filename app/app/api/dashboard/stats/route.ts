@@ -36,6 +36,8 @@ export async function GET(req: NextRequest) {
       pagosMes,
       saldoPendiente,
       productosStock,
+      totalProductos,
+      pagaresPendientes,
     ] = await Promise.all([
       // Total de clientes
       prisma.cliente.count(),
@@ -99,6 +101,18 @@ export async function GET(req: NextRequest) {
           isActive: true,
         }
       }),
+
+      // Total de productos
+      prisma.producto.count(),
+
+      // Pagarés pendientes
+      prisma.pagare.count({
+        where: {
+          estatus: {
+            in: ['PENDIENTE', 'PARCIAL', 'VENCIDO']
+          }
+        }
+      })
     ]);
 
     const stats = {
@@ -106,10 +120,14 @@ export async function GET(req: NextRequest) {
       clientesActivos,
       ventasHoy: ventasHoy?._sum?.total || 0,
       cobrosHoy: pagosHoy?._sum?.monto || 0,
+      cobranzaHoy: pagosHoy?._sum?.monto || 0, // Alias para el frontend
       ventasMes: ventasMes?._sum?.total || 0,
       cobrosMes: pagosMes?._sum?.monto || 0,
+      cobranzaMes: pagosMes?._sum?.monto || 0, // Alias para el frontend
       saldoPendiente: saldoPendiente?._sum?.saldoActual || 0,
       productosStock,
+      totalProductos,
+      pagaresPendientes,
     };
 
     return NextResponse.json(stats);

@@ -5,23 +5,24 @@ import { NextResponse } from "next/server";
 export default withAuth(
   function middleware(req) {
     const { token } = req.nextauth;
-    const isAuthPage = req.nextUrl.pathname.startsWith('/auth') || 
-                      req.nextUrl.pathname.startsWith('/api/auth');
-    const isTestPage = req.nextUrl.pathname.startsWith('/test-');
+    const path = req.nextUrl.pathname;
     
-    // If not authenticated and trying to access protected route (but allow test pages)
-    if (!token && !isAuthPage && !isTestPage && req.nextUrl.pathname !== '/') {
-      return NextResponse.redirect(new URL('/auth/signin', req.url));
-    }
+    const isAuthPage = path.startsWith('/auth') || 
+                      path.startsWith('/api/auth') ||
+                      path === '/login' ||
+                      path === '/signup';
+                      
+    const isTestPage = path.startsWith('/test-');
+    const isPublicPage = path === '/' || path === '/landing';
     
-    // If authenticated and trying to access auth pages (except API routes)
-    if (token && isAuthPage && !req.nextUrl.pathname.startsWith('/api/auth')) {
+    // If authenticated and trying to access auth pages (except API routes), redirect to dashboard
+    if (token && isAuthPage && !path.startsWith('/api/auth')) {
       return NextResponse.redirect(new URL('/dashboard', req.url));
     }
 
-    // If not authenticated and accessing root, redirect to signin
-    if (!token && req.nextUrl.pathname === '/') {
-      return NextResponse.redirect(new URL('/auth/signin', req.url));
+    // If not authenticated and trying to access protected route (but allow test and public pages)
+    if (!token && !isAuthPage && !isTestPage && !isPublicPage) {
+      return NextResponse.redirect(new URL('/login', req.url)); // Prefer branded login
     }
 
     return NextResponse.next();
@@ -29,10 +30,17 @@ export default withAuth(
   {
     callbacks: {
       authorized: ({ token, req }) => {
-        // Allow access to auth pages and test pages
-        if (req.nextUrl.pathname.startsWith('/auth') || 
-            req.nextUrl.pathname.startsWith('/api/auth') ||
-            req.nextUrl.pathname.startsWith('/test-')) {
+        const path = req.nextUrl.pathname;
+        // Allow public access to home (/), landing page (/landing), auth pages, and test pages
+        if (
+          path === '/' ||
+          path === '/landing' ||
+          path === '/login' ||
+          path === '/signup' ||
+          path.startsWith('/auth') || 
+          path.startsWith('/api/auth') ||
+          path.startsWith('/test-')
+        ) {
           return true;
         }
         // Require token for all other pages
@@ -55,3 +63,4 @@ export const config = {
     '/((?!api|_next/static|_next/image|favicon.ico|public).*)',
   ],
 };
+

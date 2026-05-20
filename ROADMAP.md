@@ -3,7 +3,7 @@
 **Proyecto**: VertexERP - Sistema ERP Empresarial Completo  
 **Versión Actual**: v4.0.0-stable  
 **Estado**: ✅ Funcional - Listo para Producción  
-**Última Actualización**: 2026-05-10  
+**Última Actualización**: 2026-05-20  
 **Normativa**: Aurum Clean Code Compliant  
 
 ---
@@ -23,10 +23,12 @@ VertexERP es un **Sistema de Planificación de Recursos Empresariales (ERP)** co
 - [x] **Seguridad y Auditoría**: Autenticación NextAuth.js, RBAC y sistema de AuditLog completo.
 - [x] **Arquitectura Modular (Addons/Plugins)**: Cimientos Core base aislados con sistema de registro, dependencias y habilitación dinámica para 10+ módulos opcionales.
 - [x] **Integraciones de Mensajería Omnicanal**: Conectores nativos estandarizados para envío automatizado de notificaciones por WhatsApp (WAHA API) y pasarelas de SMS (LabsMobile) para notificar cobros y emitir cotizaciones.
+- [x] **Estructura de Navegación Unificada (Layout Dashboard)**: Reorganización de rutas bajo el grupo `(dashboard)` para garantizar que el menú lateral (Sidebar) sea persistente en todas las vistas operativas (Clientes, Productos, etc.) y evitar pérdidas de contexto.
+- [x] **Header y Panel de Addons Unificados**: Panel administrativo mejorado para activar/desactivar addons de manera interactiva con API integrada, y header unificado en el Dashboard con notificaciones y perfil de usuario persistentes.
 
 ### 💼 Módulos de Negocio y Funcionalidades
-- [x] **Gestión de Clientes (CRM)**: Perfil detallado de clientes con historial de crédito, referencias, información laboral, aval/co-signer y geolocalización (coordenadas GPS) para cobro en campo.
-- [x] **Catálogo e Inventario Dinámico**: Gestión de productos con 5 niveles de precios configurables, stock de máximos/mínimos, ubicación en almacén (pasillos/estantes), lote, caducidades e imágenes múltiples.
+- [x] **Gestión de Clientes (CRM) & Perfil Fiscal**: Perfil detallado de clientes con historial de crédito, referencias, información laboral, aval/co-signer, geolocalización GPS y **perfil fiscal completo para CFDI 4.0** (RFC, Régimen Fiscal, Código Postal y Uso de CFDI).
+- [x] **Catálogo e Inventario Dinámico con Claves SAT**: Gestión de productos con 5 niveles de precios configurables, stock de máximos/mínimos, ubicación en almacén, lote, caducidades, imágenes múltiples e **integración de Clave SAT y Clave Unidad** para emisión directa de CFDI 4.0.
 - [x] **Movimientos de Inventario**: Bitácora y control de stock mediante movimientos clasificados (Entrada, Salida, Ajuste y Transferencia) con control de usuarios.
 - [x] **Módulo de Pedidos**: Creación, seguimiento y cancelación de pedidos con prioridades y conversión directa a ventas facturadas.
 - [x] **Cotizaciones y Presupuestos**: Generación de propuestas de presupuesto comercial con validez temporal y conversión de un solo clic a Pedidos activos o Factura de Venta directa.
@@ -39,7 +41,7 @@ VertexERP es un **Sistema de Planificación de Recursos Empresariales (ERP)** co
 - [x] **Cobranza Móvil y Pagos**: Registro de abonos distribuidos automáticamente en capital/intereses, registro de métodos de pago (efectivo, tarjeta, transferencia, cheque), geolocalización GPS satelital de la cobranza y validación de seguridad por IMEI del dispositivo.
 - [x] **Punto de Venta (POS Pymes Comercialización)**: Venta rápida por caja, soporte de escáner de barras, arqueos/apertura/cortes de caja y tickets de impresora térmica.
 - [x] **E-commerce Sincronizado**: Tienda online sincronizada con stock e inyección automatizada de pedidos al ERP con pasarelas de pago.
-- [x] **Sitio Web Corporativo y Landing Page (Webuilder)**: Sitio web público interactivo de presentación comercial con catálogo y formulario de contacto, controlable dinámicamente desde el gestor de addons.
+- [x] **Sitio Web Corporativo y Landing Page (Webuilder)**: Sitio web público interactivo y rediseñado con separador premium, catálogo de productos dinámico y formulario de contacto activo, controlable dinámicamente desde el gestor de addons.
 - [x] **Facturación Electrónica SAT (CFDI 4.0 - Contpaqi API)**: Adaptado para el marco fiscal mexicano, timbrado oficial directo de facturas, inyección de catálogos y emisión automática de Recibos Electrónicos de Pago (REP) vía el SDK de Contpaqi Comercial Premium local en el servidor.
 - [x] **Compras y Cuentas por Pagar (CXP)**: Gestión integrada de proveedores, órdenes de compra y control de vencimientos de pasivos.
 - [x] **Soporte Multiplataforma Novedoso**: Integración de capacidades nativas e instalables:
@@ -109,6 +111,26 @@ VertexERP es un **Sistema de Planificación de Recursos Empresariales (ERP)** co
 | | - Creación del conector contpaqi.ts con soporte para tokens de seguridad y Multi-Empresa | |
 | | - Endpoint /api/facturacion/timbrar con mapeo dinámico a CFDI 4.0 (PUE/PPD y Uso CFDI) | |
 | | - Sincronización automática de abonos a Recibos Electrónicos de Pago (REP) en base de datos | |
+| 2026-05-18 | **Integración Fiscal Completa (CFDI 4.0) en Clientes/Productos** | ✅ |
+| | - Campos RFC, Régimen, CP y Uso CFDI en Clientes con base de datos, modales y formularios | |
+| | - Clave SAT y Clave Unidad integrados en Productos con base de datos, modales y formularios | |
+| 2026-05-18 | **Garantía de Navegación Persistente y Corrección de Sidebar** | ✅ |
+| | - Agrupamiento de rutas logeadas en subdirectorio modular `(dashboard)` | |
+| | - Solución definitiva de pérdida de menú/sidebar al entrar a vistas hijas | |
+| | - Sidebar colapsable estilizado y corrección de solapamiento en layouts responsivos | |
+| 2026-05-19 | **Consolidación de Landing Page, Dashboard Header y Addon Panel** | ✅ |
+| | - Rediseño interactivo completo de Landing Page con separadores y catálogo dinámico | |
+| | - Unificación de Header del Dashboard con datos de perfil y campana de notificaciones | |
+| | - Backend `/api/configuracion/addons` y UI del configurador para habilitar addons de forma dinámica | |
+| | - Ajustes finales de tipado estricto en respuestas y modales de facturación CFDI | |
+| 2026-05-20 | **Integración de Analítica y Dashboards en Vivo (Cero Mocks)** | ✅ |
+| | - Eliminación total de datos simulados en la pantalla de Business Intelligence | |
+| | - Conexión de KPIs, tendencias de ventas y categorías a base de datos PostgreSQL | |
+| | - Motor de proyecciones IA en base a regresión lineal real calculada en backend | |
+| | - Corrección en API de exportación de reportes a CSV resolviendo tipados de Prisma (`take` en vez de `limit`) | |
+| | - Activación pública del Sitio Web Corporativo (Landing Page) y ruta `/landing` resolviendo bloqueo de Next-Auth y redirecciones de sesión en middleware | |
+| | - Verificación exitosa de compilación limpia de producción con `npm run build` | |
+
 
 ---
 **Responsable**: Lead Architect & DevOps  
